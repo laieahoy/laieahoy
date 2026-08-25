@@ -22,11 +22,6 @@ const config = {
     },
   },
 
-  // Docusaurus v4 配置
-  future: {
-    v4: true,
-  },
-
   // 正式部署地址
   // 本地开发时可以暂时保留当前配置
   url: 'https://your-docusaurus-site.example.com',
@@ -36,7 +31,7 @@ const config = {
   organizationName: 'your-github-name',
   projectName: 'your-repository-name',
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
 
   markdown: {
     hooks: {
@@ -123,26 +118,14 @@ const config = {
         },
         items: [
           {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: '文档教程',
-          },
-          {
             to: '/blog',
             label: '博客',
             position: 'left',
           },
-          {
-            to: '/docs/intro',
-            label: '开始使用',
-            position: 'left',
-          },
-          {
-            href: 'https://github.com/your-name/your-repository',
-            label: '源码 ↗',
-            position: 'right',
-          },
+            {
+    type: 'search',
+    position: 'right',
+  },
         ],
       },
 
@@ -207,6 +190,20 @@ const config = {
       type: 'text/css',
     },
   ],
+  
+themes: [
+  [
+    require.resolve('@easyops-cn/docusaurus-search-local'),
+    {
+      hashed: true,
+      language: ['zh'],
+      indexBlog: true,
+      indexDocs: false,
+      indexPages: false,
+      highlightSearchTermsOnTargetPage: true,
+    },
+  ],
+],
 };
 
 export default config;

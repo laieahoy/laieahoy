@@ -1,72 +1,59 @@
 .wrapper {
   --ink: #191919;
   --blue: #0875a8;
-
+  --accent: #d99b16;
   position: fixed;
   top: 0;
   left: 50%;
   z-index: 1001;
-
   width: 118px;
   height: 150px;
-
   pointer-events: none;
   transform: translateX(-50%);
+  transition: opacity 420ms ease, visibility 420ms ease;
 }
 
-/* 蜘蛛主体。顶部蛛丝位于主体之外，因此只随主体下坠 */
+.wrapper.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .hangingSpider {
   position: relative;
-
   width: 118px;
   height: 150px;
-
-  transform: translateY(0);
+  transform: translateY(0) rotate(0deg);
   transform-origin: 59px 0;
   transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: spiderSway 5s ease-in-out infinite;
 }
 
-/* 图片区域不设置边框、阴影或背景 */
+.wrapper:hover .hangingSpider,
+.wrapper:focus-within .hangingSpider {
+  transform: translateY(10px) rotate(1.5deg);
+  animation-play-state: paused;
+}
+
 .pictureFrame {
   position: absolute;
   top: 22px;
   left: 50%;
   z-index: 2;
-
   width: 112px;
   height: 112px;
-
-  border: 0;
-  outline: 0;
-  box-shadow: none;
   background: transparent;
   overflow: visible;
   pointer-events: auto;
   transform: translateX(-50%);
 }
 
-.pictureFrame::before,
-.pictureFrame::after {
-  content: none;
-  display: none;
-}
-
-/* 鼠标悬停图片时，蜘蛛侠和时钟一起下坠 */
-.wrapper:hover .hangingSpider,
-.wrapper:has(.pictureFrame:hover) .hangingSpider {
-  transform: translateY(10px);
-}
-
-/* 顶部固定蛛丝 */
 .fixedWeb {
   position: absolute;
   top: 0;
   left: 50%;
   z-index: 3;
-
   width: 3px;
   height: 27px;
-
   border-radius: 4px;
   background: var(--ink);
   pointer-events: none;
@@ -75,246 +62,201 @@
 
 .spiderImage {
   display: block;
-
   width: 100%;
   height: 100%;
-
   object-fit: contain;
-  filter: none;
   pointer-events: auto;
-  transition: filter 450ms ease;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-drag: none;
+  transition: filter 450ms ease, transform 180ms ease;
 }
 
-/* 时钟覆盖层与图片保持相对位置 */
+.spiderImage:active {
+  transform: scale(0.94);
+}
+
+.statusFace {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  z-index: 6;
+  min-width: 18px;
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 0 0 4px #fff;
+  pointer-events: none;
+  animation: facePop 280ms ease-out;
+}
+
+.moodSleeping .spiderImage { filter: saturate(0.55) brightness(0.8); }
+.moodHappy .spiderImage { animation: happyBounce 500ms ease-out; }
+.moodSlinging .spiderImage { animation: slingBounce 450ms ease-out; }
+
 .clockOverlay {
   position: absolute;
   inset: 8px;
-
   width: calc(100% - 16px);
   height: calc(100% - 16px);
-
   pointer-events: none;
 }
 
-.tick {
-  stroke: var(--ink);
-  stroke-width: 1;
-  stroke-linecap: round;
-  opacity: 0.95;
-}
+.tick { stroke: var(--ink); stroke-width: 1; stroke-linecap: round; opacity: .95; }
+.hourHand, .minuteHand, .secondHand { transform-box: fill-box; transform-origin: 50% 100%; stroke-linecap: round; }
+.hourHand { stroke: #0b1210; stroke-width: 3.6; }
+.minuteHand { stroke: #0b1210; stroke-width: 2.5; }
+.secondHand { stroke: var(--accent); stroke-width: 1.7; }
+.pin { fill: var(--accent); stroke: #0b1210; stroke-width: 1.2; }
 
-.hourHand,
-.minuteHand,
-.secondHand {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  stroke-linecap: round;
-}
-
-.hourHand {
-  stroke: #0b1210;
-  stroke-width: 3.6;
-}
-
-.minuteHand {
-  stroke: #0b1210;
-  stroke-width: 2.5;
-}
-
-.secondHand {
-  stroke: #b87908;
-  stroke-width: 1.7;
-}
-
-.pin {
-  fill: #d99b16;
-  stroke: #0b1210;
-  stroke-width: 1.2;
-}
-
-/* 两只手的共同样式 */
-.leftHand,
-.rightHand {
+.leftHand, .rightHand {
   position: absolute;
   top: 69px;
   z-index: 4;
-
   width: 31px;
   height: 7px;
-
   border-radius: 99px;
   background: var(--blue);
   opacity: 0;
   pointer-events: none;
-
-  transition:
-    opacity 220ms ease,
-    transform 180ms ease;
+  transition: opacity 220ms ease, transform 220ms cubic-bezier(.2, 1.5, .4, 1);
 }
 
-.leftHand {
-  left: 5px;
-  transform: translateX(12px) rotate(var(--hand-angle, 0deg));
-  transform-origin: right center;
+.leftHand { left: 5px; transform: translateX(12px) scaleX(.25) rotate(var(--hand-angle, 0deg)); transform-origin: right center; }
+.rightHand { right: 5px; transform: translateX(-12px) scaleX(.25) rotate(var(--hand-angle, 0deg)); transform-origin: left center; }
+.handVisible { opacity: 1; }
+.handVisible.leftHand { transform: translateX(0) scaleX(1) rotate(var(--hand-angle, 0deg)); }
+.handVisible.rightHand { transform: translateX(0) scaleX(1) rotate(var(--hand-angle, 0deg)); }
+
+.spiderDialog {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 12px);
+  z-index: 10;
+  max-width: 230px;
+  min-width: 120px;
+  padding: 9px 13px;
+  border: 1px solid rgba(25,25,25,.22);
+  border-radius: 8px;
+  background: #fff;
+  color: #191919;
+  box-shadow: 0 7px 18px rgba(0,0,0,.16), 0 2px 5px rgba(0,0,0,.1);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  transform: translateY(-50%);
+  animation: spiderDialogAppear 180ms ease-out both;
 }
 
-.rightHand {
-  right: 5px;
-  transform: translateX(-12px) rotate(var(--hand-angle, 0deg));
-  transform-origin: left center;
+.spiderDialog::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -6px;
+  width: 10px;
+  height: 10px;
+  border-left: 1px solid rgba(25,25,25,.22);
+  border-bottom: 1px solid rgba(25,25,25,.22);
+  background: #fff;
+  transform: translateY(-50%) rotate(45deg);
 }
 
-/* React 根据鼠标方向添加 handVisible */
-.handVisible {
-  opacity: 1;
+.settingsButton {
+  position: absolute;
+  top: 25px;
+  right: -25px;
+  z-index: 12;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(80,80,80,.35);
+  border-radius: 50%;
+  background: rgba(255,255,255,.92);
+  color: var(--ink);
+  cursor: pointer;
+  pointer-events: auto;
+  line-height: 20px;
 }
 
-/* 暗色模式 */
-.wrapper.dark {
-  --ink: #e7ebe7;
-  --blue: #249bd3;
+.settingsMenu {
+  position: absolute;
+  top: 54px;
+  right: -178px;
+  z-index: 11;
+  display: grid;
+  gap: 8px;
+  width: 164px;
+  padding: 11px;
+  border: 1px solid rgba(25,25,25,.2);
+  border-radius: 9px;
+  background: #fff;
+  color: #191919;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  font-size: 11px;
+  pointer-events: auto;
 }
 
-.wrapper.dark .leftHand,
-.wrapper.dark .rightHand {
-  background: var(--blue);
-  box-shadow: 0 0 0 1px rgba(231, 235, 231, 0.45);
-}
+.settingsMenu label { display: grid; gap: 4px; }
+.settingsMenu select, .settingsMenu button { width: 100%; padding: 4px 6px; font-size: 11px; cursor: pointer; }
 
-.wrapper.dark .spiderImage {
-  filter: brightness(0.28) contrast(1.35) saturate(0.45) sepia(0.1);
-}
-
-.wrapper.dark .tick {
-  stroke: #e7ebe7;
-}
-
-.wrapper.dark .hourHand,
-.wrapper.dark .minuteHand {
-  stroke: #e7ebe7;
-}
-
-.wrapper.dark .secondHand {
-  stroke: #eabf45;
-}
-
-.wrapper.dark .pin {
-  fill: #eabf45;
-  stroke: #e7ebe7;
-}
-
-/* 点击链接时的蛛丝动画 */
-.webAnimation {
+.mouseTrail {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-
+  z-index: 1000;
   width: 100vw;
   height: 100vh;
   pointer-events: none;
 }
+.mouseTrail line { fill: none; stroke-width: 1.4; stroke-linecap: round; opacity: .7; filter: drop-shadow(0 0 3px currentColor); }
+.trailLight line { stroke: #0875a8; }
+.trailDark line { stroke: #8ee4ff; }
 
-.webLayer {
-  position: fixed;
-  inset: 0;
+.wrapper.dark { --ink: #e7ebe7; --blue: #249bd3; --accent: #eabf45; }
+.wrapper.dark .spiderDialog, .wrapper.dark .settingsMenu { background: #171b1d; color: #e7ebe7; border-color: rgba(231,235,231,.28); }
+.wrapper.dark .spiderDialog::after { border-color: rgba(231,235,231,.28); background: #171b1d; }
+.wrapper.dark .settingsButton { background: #171b1d; color: #e7ebe7; border-color: rgba(231,235,231,.35); }
+.wrapper.dark .spiderImage { filter: brightness(.28) contrast(1.35) saturate(.45) sepia(.1); }
+.wrapper.dark .hourHand, .wrapper.dark .minuteHand { stroke: #e7ebe7; }
 
-  display: block;
-  width: 100vw;
-  height: 100vh;
+/* 按时间变化的主题 */
+.wrapper.day { --accent: #d99b16; }
+.wrapper.dusk { --accent: #d8662d; --blue: #8c55b8; }
+.wrapper.night { --accent: #7bc7ff; --blue: #6d8cff; }
 
-  overflow: visible;
-  pointer-events: none;
-}
+.themeStealth { --blue: #4c5961; --accent: #aebcc2; }
+.themeStealth .spiderImage { filter: grayscale(.7) contrast(1.25); }
+.themeNeon { --blue: #ff27b7; --accent: #48f6ff; }
+.themeNeon .spiderImage { filter: saturate(1.8) contrast(1.1) drop-shadow(0 0 5px #48f6ff); }
+.themeNeon .fixedWeb { box-shadow: 0 0 7px var(--accent); }
 
-.shootingWeb {
-  fill: none;
-  stroke-width: 1.2;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  animation: webAppear 160ms ease-out both;
-}
+.webAnimation { position: fixed; inset: 0; z-index: 9999; width: 100vw; height: 100vh; pointer-events: none; }
+.webLayer { position: fixed; inset: 0; display: block; width: 100vw; height: 100vh; overflow: visible; pointer-events: none; }
+.shootingWeb { fill: none; stroke-width: 1.2; stroke-linecap: round; vector-effect: non-scaling-stroke; animation: webAppear 160ms ease-out both; }
+.webLight .shootingWeb { stroke: #111827; filter: drop-shadow(0 0 1px rgba(0,0,0,.85)) drop-shadow(0 0 3px rgba(0,0,0,.35)); }
+.webDark .shootingWeb { stroke: rgba(255,255,255,.96); filter: drop-shadow(0 0 2px rgba(255,255,255,.8)); }
+.liftedPreview { position: fixed; z-index: 10000; max-width: min(320px,70vw); max-height: min(240px,50vh); object-fit: contain; pointer-events: none; transform: translate(-50%,-50%); }
 
-.webLight .shootingWeb {
-  color: #111827;
-  stroke: #111827;
-  filter:
-    drop-shadow(0 0 1px rgba(0, 0, 0, 0.85))
-    drop-shadow(0 0 3px rgba(0, 0, 0, 0.35));
-}
-
-.webDark .shootingWeb {
-  color: rgba(255, 255, 255, 0.96);
-  stroke: rgba(255, 255, 255, 0.96);
-  filter:
-    drop-shadow(0 0 2px rgba(255, 255, 255, 0.8))
-    drop-shadow(0 0 4px rgba(255, 255, 255, 0.35));
-}
-
-@keyframes webAppear {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.liftedPreview {
-  position: fixed;
-  z-index: 10000;
-
-  max-width: min(320px, 70vw);
-  max-height: min(240px, 50vh);
-
-  object-fit: contain;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-}
+@keyframes spiderSway { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(3px) rotate(1deg); } }
+@keyframes happyBounce { 50% { transform: scale(1.06) rotate(2deg); } }
+@keyframes slingBounce { 35% { transform: translateX(5px) rotate(-3deg); } 70% { transform: translateX(-3px) rotate(2deg); } }
+@keyframes facePop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+@keyframes webAppear { from { opacity: 0; } to { opacity: 1; } }
+@keyframes spiderDialogAppear { from { opacity: 0; transform: translate(-10px,-50%) scale(.88); } to { opacity: 1; transform: translateY(-50%) scale(1); } }
 
 @media (max-width: 576px) {
-  .wrapper {
-    width: 96px;
-    height: 124px;
-  }
-
-  .hangingSpider {
-    width: 96px;
-    height: 124px;
-    transform-origin: 48px 0;
-  }
-
-  .pictureFrame {
-    top: 18px;
-    width: 92px;
-    height: 92px;
-  }
-
-  .fixedWeb {
-    height: 22px;
-  }
-
-  .wrapper:hover .hangingSpider,
-  .wrapper:has(.pictureFrame:hover) .hangingSpider {
-    transform: translateY(8px);
-  }
-
-  .leftHand,
-  .rightHand {
-    top: 57px;
-    width: 25px;
-    height: 6px;
-  }
+  .wrapper { width: 96px; height: 124px; }
+  .hangingSpider { width: 96px; height: 124px; transform-origin: 48px 0; }
+  .pictureFrame { top: 18px; width: 92px; height: 92px; }
+  .fixedWeb { height: 22px; }
+  .leftHand, .rightHand { top: 57px; width: 25px; height: 6px; }
+  .spiderDialog { left: calc(100% + 8px); max-width: 180px; min-width: 100px; padding: 7px 10px; font-size: 11px; }
+  .settingsButton { right: -23px; }
+  .settingsMenu { right: -158px; width: 145px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hangingSpider,
-  .spiderImage,
-  .leftHand,
-  .rightHand,
-  .shootingWeb,
-  .liftedPreview {
-    animation: none;
-    transition: none;
-  }
+  .hangingSpider, .spiderImage, .leftHand, .rightHand, .shootingWeb, .spiderDialog, .statusFace { animation: none; transition: none; }
 }
