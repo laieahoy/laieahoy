@@ -1,30 +1,294 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
-
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-color-primary: #43816a;
+  --ifm-color-primary-dark: #376f59;
+  --ifm-color-primary-darker: #326850;
+  --ifm-color-primary-darkest: #285441;
+  --ifm-color-primary-light: #65b592;
+  --ifm-color-primary-lighter: #78c3a0;
+  --ifm-color-primary-lightest: #9bd7ba;
+
+  --site-bg: #ffffff;
+  --site-surface: #f3f6f1;
+  --site-surface-strong: #e8f0ea;
+  --site-text: #17221f;
+  --site-text-soft: #687870;
+  --site-border: #dce5de;
+  --site-primary: #43816a;
+  --site-primary-dark: #23483b;
+  --site-primary-light: #65b592;
+  --site-primary-soft: #d9eee2;
+  --site-card: #f7faf7;
+  --site-shadow: #dcebe0;
+  --site-strip: #ffffff;
+  --site-button-text: #ffffff;
+
+  --ifm-background-color: var(--site-bg);
+  --ifm-background-surface-color: var(--site-surface);
+  --ifm-font-family-base: system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #79d3ab;
+  --ifm-color-primary-dark: #62c798;
+  --ifm-color-primary-darker: #56c18f;
+  --ifm-color-primary-darkest: #3ca976;
+  --ifm-color-primary-light: #91ddb9;
+  --ifm-color-primary-lighter: #a1e3c4;
+  --ifm-color-primary-lightest: #c0efd6;
+
+  --site-bg: #101412;
+  --site-surface: #171d1a;
+  --site-surface-strong: #202a25;
+  --site-text: #e8f2eb;
+  --site-text-soft: #aabbb0;
+  --site-border: #34433a;
+  --site-primary: #79d3ab;
+  --site-primary-dark: #b9f0d2;
+  --site-primary-light: #78cda5;
+  --site-primary-soft: #294b3b;
+  --site-card: #1b241f;
+  --site-shadow: #0b0f0d;
+  --site-strip: #151b18;
+  --site-button-text: #102018;
+
+  --ifm-background-color: var(--site-bg);
+  --ifm-background-surface-color: var(--site-surface);
+}
+
+/* 基础页面颜色 */
+html,
+body {
+  background: var(--site-bg);
+  color: var(--site-text);
+}
+
+body,
+.main-wrapper {
+  min-height: 100vh;
+  background: var(--site-bg);
+  color: var(--site-text);
+}
+
+/* 页面主题切换过渡 */
+html,
+body,
+.navbar,
+.footer,
+.main-wrapper,
+.hero,
+.statusStrip,
+.contentSection,
+.infoCard,
+.terminal,
+.button,
+.navbar__link,
+.navbar__title,
+.menu__link {
+  transition:
+    background-color 0.45s ease,
+    color 0.45s ease,
+    border-color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+/* 顶部导航栏 */
+.navbar {
+  background: var(--site-surface);
+  border-bottom: 1px solid var(--site-border);
+  box-shadow: none;
+}
+
+.navbar__title,
+.navbar__link,
+.menu__link {
+  color: var(--site-text);
+}
+
+.navbar__title:hover,
+.navbar__link:hover,
+.menu__link:hover {
+  color: var(--site-primary);
+}
+
+.navbar__toggle {
+  color: var(--site-text);
+}
+
+.navbar__toggle:hover {
+  background: var(--site-primary-soft);
+}
+
+/* 移动端菜单 */
+.navbar-sidebar {
+  background: var(--site-surface);
+}
+
+.navbar-sidebar__back,
+.navbar-sidebar__brand {
+  background: var(--site-surface);
+  border-bottom-color: var(--site-border);
+}
+
+.navbar-sidebar .menu__link {
+  color: var(--site-text);
+}
+
+/* 页脚 */
+.footer {
+  background: var(--site-surface-strong);
+  color: var(--site-text-soft);
+}
+
+.footer__title {
+  color: var(--site-text);
+}
+
+.footer__link-item {
+  color: var(--site-text-soft);
+}
+
+.footer__link-item:hover {
+  color: var(--site-primary);
+}
+
+/* Docusaurus 默认链接 */
+a {
+  color: var(--site-primary);
+}
+
+a:hover {
+  color: var(--site-primary-dark);
+}
+
+[data-theme='dark'] a:hover {
+  color: var(--site-primary-light);
+}
+
+/* 默认按钮 */
+.button--primary {
+  background: var(--site-primary-dark);
+  border-color: var(--site-primary-dark);
+  color: var(--site-button-text);
+}
+
+.button--primary:hover {
+  background: var(--site-primary);
+  border-color: var(--site-primary);
+  color: var(--site-button-text);
+}
+
+.button--secondary {
+  background: transparent;
+  border-color: var(--site-border);
+  color: var(--site-primary);
+}
+
+.button--secondary:hover {
+  background: var(--site-primary-soft);
+  border-color: var(--site-primary);
+  color: var(--site-text);
+}
+
+/* 文档和博客区域 */
+.theme-doc-markdown,
+.blog-post,
+.blog-list-page {
+  color: var(--site-text);
+}
+
+.theme-doc-sidebar-container {
+  border-right-color: var(--site-border);
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  background: var(--site-primary-soft);
+  color: var(--site-primary);
+}
+
+.table-of-contents__link {
+  color: var(--site-text-soft);
+}
+
+.table-of-contents__link--active,
+.table-of-contents__link:hover {
+  color: var(--site-primary);
+}
+
+.pagination-nav__link {
+  border-color: var(--site-border);
+  background: var(--site-card);
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--site-primary-light);
+  background: var(--site-surface-strong);
+}
+
+.pagination-nav__sublabel {
+  color: var(--site-text-soft);
+}
+
+.pagination-nav__label {
+  color: var(--site-primary);
+}
+
+/* 搜索框、输入框和下拉菜单 */
+input,
+textarea,
+select {
+  background: var(--site-card);
+  border-color: var(--site-border);
+  color: var(--site-text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--site-text-soft);
+}
+
+.dropdown__menu {
+  background: var(--site-surface);
+  border-color: var(--site-border);
+}
+
+.dropdown__link {
+  color: var(--site-text);
+}
+
+.dropdown__link:hover {
+  background: var(--site-primary-soft);
+  color: var(--site-primary);
+}
+
+/* 代码块 */
+.theme-code-block {
+  border: 1px solid var(--site-border);
+  box-shadow: none;
+}
+
+/* 选中文本 */
+::selection {
+  background: var(--site-primary-soft);
+  color: var(--site-text);
+}
+
+/* 辅助功能：用户减少动态效果时关闭过渡 */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  .navbar,
+  .footer,
+  .main-wrapper,
+  .hero,
+  .statusStrip,
+  .contentSection,
+  .infoCard,
+  .terminal,
+  .button,
+  .navbar__link,
+  .navbar__title,
+  .menu__link {
+    transition: none;
+  }
 }

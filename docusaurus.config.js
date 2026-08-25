@@ -7,8 +7,8 @@ import rehypeKatex from 'rehype-katex';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   // 网站基本信息
-  title: '我的网站',
-  tagline: '一个简洁、实用的中文知识网站',
+  title: '505 Not Found',
+  tagline: '这里没有找到答案，但找到了一个博客。',
   favicon: 'img/favicon.ico',
 
   // 网站语言设置
@@ -22,24 +22,22 @@ const config = {
     },
   },
 
-  // Docusaurus v4 相关配置
+  // Docusaurus v4 配置
   future: {
     v4: true,
   },
 
-  // 网站正式部署地址
-  // 如果目前只在本地运行，可以暂时保留下面的地址
-  // 发布到 GitHub Pages 时，需要改成你的真实网址
+  // 正式部署地址
+  // 本地开发时可以暂时保留当前配置
   url: 'https://your-docusaurus-site.example.com',
   baseUrl: '/',
 
   // GitHub Pages 配置
-  // 如果以后部署到 GitHub，请改成你自己的用户名和仓库名
   organizationName: 'your-github-name',
   projectName: 'your-repository-name',
 
-  // 遇到链接错误时直接报错，便于及时发现问题
   onBrokenLinks: 'throw',
+
   markdown: {
     hooks: {
       onBrokenMarkdownLinks: 'warn',
@@ -52,30 +50,18 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          // 数学公式支持
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
-
           sidebarPath: './sidebars.js',
-
-          // 显示最后更新时间
           showLastUpdateTime: true,
           showLastUpdateAuthor: false,
-
-          // 暂时没有设置 GitHub 编辑地址，因此先隐藏“编辑此页”链接
-          // 以后有自己的 GitHub 仓库后，可以取消下面的注释并修改地址
-          // editUrl: 'https://github.com/你的用户名/你的仓库名/tree/main/',
         },
 
         blog: {
-          // 博客页面中文标题和描述
           blogTitle: '博客',
           blogDescription: '记录学习、思考与实践。',
-
-          // 数学公式支持
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
-
           showReadingTime: true,
           showLastUpdateTime: true,
 
@@ -84,11 +70,6 @@ const config = {
             xslt: true,
           },
 
-          // 暂时隐藏“编辑此页”链接
-          // 以后有自己的 GitHub 仓库后再启用
-          // editUrl: 'https://github.com/你的用户名/你的仓库名/tree/main/',
-
-          // 没有摘要分隔符时给出提醒
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
@@ -107,19 +88,19 @@ const config = {
       // 网站分享卡片
       image: 'img/docusaurus-social-card.jpg',
 
-      // 浏览器标签页和搜索引擎描述
+      // 搜索引擎描述
       metadata: [
         {
           name: 'keywords',
-          content: '中文教程, 技术文档, 学习笔记, 博客',
+          content: '技术博客, 学习笔记, 中文教程, 编程, 开发',
         },
         {
           name: 'description',
-          content: '一个记录学习、技术与实践的中文网站。',
+          content: '一个记录技术、学习、项目与思考的个人博客。',
         },
       ],
 
-      // 主题颜色设置
+      // 深色 / 浅色模式
       colorMode: {
         defaultMode: 'light',
         respectPrefersColorScheme: true,
@@ -135,9 +116,9 @@ const config = {
 
       // 顶部导航栏
       navbar: {
-        title: '我的网站',
+        title: '505 Not Found',
         logo: {
-          alt: '我的网站 Logo',
+          alt: '505 Not Found Logo',
           src: 'img/logo.svg',
         },
         items: [
@@ -158,16 +139,17 @@ const config = {
             position: 'left',
           },
           {
-            href: 'https://github.com/你的用户名/你的仓库名',
-            label: '源代码',
+            href: 'https://github.com/your-name/your-repository',
+            label: '源码 ↗',
             position: 'right',
           },
         ],
       },
 
-      // 底部页脚
+      // 页脚
+      // 使用 light 可以让页脚跟随 CSS 深浅色变量变化
       footer: {
-        style: 'dark',
+        style: 'light',
         links: [
           {
             title: '文档',
@@ -201,14 +183,20 @@ const config = {
             ],
           },
         ],
-        copyright: `版权所有 © ${new Date().getFullYear()} 我的网站。使用 Docusaurus 构建。`,
+        copyright: `版权所有 © ${new Date().getFullYear()} 505 Not Found。使用 Docusaurus 构建。`,
       },
 
       // 代码高亮主题
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
-        additionalLanguages: ['bash', 'java', 'python', 'json', 'yaml'],
+        additionalLanguages: [
+          'bash',
+          'java',
+          'python',
+          'json',
+          'yaml',
+        ],
       },
     }),
 
