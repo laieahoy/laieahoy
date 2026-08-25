@@ -193,14 +193,33 @@ const config = {
   
 themes: [
   [
-    require.resolve('@easyops-cn/docusaurus-search-local'),
+    require.resolve("@easyops-cn/docusaurus-search-local"),
     {
       hashed: true,
-      language: ['zh'],
-      indexBlog: true,
+      language: ["en", "zh"],
       indexDocs: false,
+      indexBlog: true,
       indexPages: false,
+      docsRouteBasePath: [
+        "/docs",
+        "/math",
+        "/algorithm-beginner",
+        "/algorithm-intermediate",
+        "/algorithm-advanced",
+        "/problem-solution",
+      ],
+      docsDir: [
+        "docs",
+        "math",
+        "algorithm/beginner",
+        "algorithm/intermediate",
+        "algorithm/advanced",
+        "algorithm/problemsolution",
+      ],
+      blogRouteBasePath: "/blog",
+      blogDir: "blog",
       highlightSearchTermsOnTargetPage: true,
+      searchResultLimits: 10,
     },
   ],
 ],
