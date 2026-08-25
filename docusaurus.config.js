@@ -5,6 +5,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
 /** @type {import('@docusaurus/types').Config} */
+
 const config = {
   // 网站基本信息
   title: '505 Not Found',
@@ -52,23 +53,11 @@ const config = {
           showLastUpdateAuthor: false,
         },
 
-        blog: {
-          blogTitle: '博客',
-          blogDescription: '记录学习、思考与实践。',
-          remarkPlugins: [remarkMath],
-          rehypePlugins: [rehypeKatex],
-          showReadingTime: true,
-          showLastUpdateTime: true,
-
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+blog: {
+  showReadingTime: true,
+  remarkPlugins: [remarkMath],
+  rehypePlugins: [rehypeKatex],
+},
 
         theme: {
           customCss: './src/css/custom.css',
@@ -116,17 +105,28 @@ const config = {
           alt: '505 Not Found Logo',
           src: 'img/logo.svg',
         },
-        items: [
-          {
-            to: '/blog',
-            label: '博客',
-            position: 'left',
-          },
-            {
-    type: 'search',
-    position: 'right',
-  },
-        ],
+     items: [
+    {
+      to: '/blog',
+      label: '博客',
+      position: 'left',
+    },
+    {
+      to: '/categories',
+      label: '分类',
+      position: 'left',
+    },
+    {
+      to: '/blog/tags',
+      label: '标签',
+      position: 'left',
+    },
+    {
+      to: '/blog/archive',
+      label: '归档',
+      position: 'left',
+    },
+  ],
       },
 
       // 页脚
