@@ -24,11 +24,17 @@
 
   --ifm-background-color: var(--site-bg);
   --ifm-background-surface-color: var(--site-surface);
-  --ifm-font-family-base: system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', sans-serif;
+  --ifm-navbar-height: 64px;
+  --ifm-navbar-padding-horizontal: 24px;
+  --ifm-font-family-base:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   --ifm-color-primary: #79d3ab;
   --ifm-color-primary-dark: #62c798;
   --ifm-color-primary-darker: #56c18f;
@@ -56,7 +62,7 @@
   --ifm-background-surface-color: var(--site-surface);
 }
 
-/* 基础页面颜色 */
+/* 基础页面 */
 html,
 body {
   background: var(--site-bg);
@@ -70,7 +76,7 @@ body,
   color: var(--site-text);
 }
 
-/* 页面主题切换过渡 */
+/* 主题切换过渡 */
 html,
 body,
 .navbar,
@@ -86,32 +92,133 @@ body,
 .navbar__title,
 .menu__link {
   transition:
-    background-color 0.45s ease,
-    color 0.45s ease,
-    border-color 0.45s ease,
-    box-shadow 0.45s ease;
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
 }
 
-/* 顶部导航栏 */
+/* 顶栏 */
 .navbar {
+  position: relative;
+  height: 64px;
+  padding: 0 24px;
   background: var(--site-surface);
   border-bottom: 1px solid var(--site-border);
-  box-shadow: none;
+  box-shadow: 0 1px 0 rgba(23, 34, 31, 0.02);
+  z-index: 100;
 }
 
-.navbar__title,
-.navbar__link,
-.menu__link {
+.navbar__inner {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.navbar__items {
+  gap: 6px;
+}
+
+.navbar__items--left {
+  min-width: 0;
+}
+
+.navbar__items--right {
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* 品牌区域 */
+.navbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+  margin-right: 24px;
   color: var(--site-text);
 }
 
-.navbar__title:hover,
-.navbar__link:hover,
-.menu__link:hover {
-  color: var(--site-primary);
+.navbar__logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
 }
 
+.navbar__title {
+  overflow: hidden;
+  color: var(--site-text);
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 导航链接 */
+.navbar__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--site-text);
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.navbar__link:hover {
+  color: var(--site-primary);
+  background: var(--site-primary-soft);
+  text-decoration: none;
+}
+
+.navbar__link--active {
+  color: var(--site-primary);
+  font-weight: 700;
+}
+
+/* 右侧源码链接 */
+.navbar__items--right .navbar__link[href*="github"] {
+  min-height: 36px;
+  padding: 0 14px;
+  border-color: var(--site-border);
+  color: var(--site-text);
+  background: transparent;
+}
+
+.navbar__items--right .navbar__link[href*="github"]:hover {
+  border-color: var(--site-primary);
+  color: var(--site-primary);
+  background: var(--site-primary-soft);
+}
+
+/* 主题切换按钮 */
+.navbar__items--right button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--site-border);
+  border-radius: 6px;
+  color: var(--site-text);
+  background: transparent;
+}
+
+.navbar__items--right button:hover {
+  border-color: var(--site-primary);
+  color: var(--site-primary);
+  background: var(--site-primary-soft);
+}
+
+/* 移动端菜单按钮 */
 .navbar__toggle {
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+  border-radius: 6px;
   color: var(--site-text);
 }
 
@@ -119,7 +226,7 @@ body,
   background: var(--site-primary-soft);
 }
 
-/* 移动端菜单 */
+/* 移动端侧栏 */
 .navbar-sidebar {
   background: var(--site-surface);
 }
@@ -132,6 +239,12 @@ body,
 
 .navbar-sidebar .menu__link {
   color: var(--site-text);
+}
+
+.navbar-sidebar .menu__link:hover,
+.navbar-sidebar .menu__link--active {
+  color: var(--site-primary);
+  background: var(--site-primary-soft);
 }
 
 /* 页脚 */
@@ -152,7 +265,7 @@ body,
   color: var(--site-primary);
 }
 
-/* Docusaurus 默认链接 */
+/* 默认链接 */
 a {
   color: var(--site-primary);
 }
@@ -161,7 +274,7 @@ a:hover {
   color: var(--site-primary-dark);
 }
 
-[data-theme='dark'] a:hover {
+[data-theme="dark"] a:hover {
   color: var(--site-primary-light);
 }
 
@@ -190,7 +303,7 @@ a:hover {
   color: var(--site-text);
 }
 
-/* 文档和博客区域 */
+/* 文档和博客 */
 .theme-doc-markdown,
 .blog-post,
 .blog-list-page {
@@ -233,7 +346,7 @@ a:hover {
   color: var(--site-primary);
 }
 
-/* 搜索框、输入框和下拉菜单 */
+/* 表单 */
 input,
 textarea,
 select {
@@ -273,22 +386,59 @@ textarea::placeholder {
   color: var(--site-text);
 }
 
-/* 辅助功能：用户减少动态效果时关闭过渡 */
+/* 平板 */
+@media (max-width: 996px) {
+  .navbar {
+    padding: 0 16px;
+  }
+
+  .navbar__brand {
+    min-width: auto;
+    margin-right: 8px;
+  }
+
+  .navbar__items--right .navbar__link[href*="github"] {
+    display: none;
+  }
+}
+
+/* 手机 */
+@media (max-width: 576px) {
+  :root {
+    --ifm-navbar-height: 58px;
+  }
+
+  .navbar {
+    height: 58px;
+    padding: 0 12px;
+  }
+
+  .navbar__logo {
+    width: 27px;
+    height: 27px;
+  }
+
+  .navbar__title {
+    max-width: 130px;
+    font-size: 14px;
+  }
+
+  .navbar__items--right {
+    gap: 4px;
+  }
+
+  .navbar__items--right button {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* 减少动态效果 */
 @media (prefers-reduced-motion: reduce) {
-  html,
-  body,
-  .navbar,
-  .footer,
-  .main-wrapper,
-  .hero,
-  .statusStrip,
-  .contentSection,
-  .infoCard,
-  .terminal,
-  .button,
-  .navbar__link,
-  .navbar__title,
-  .menu__link {
-    transition: none;
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
   }
 }

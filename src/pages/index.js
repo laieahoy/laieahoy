@@ -98,8 +98,6 @@ function HomepageContent() {
             <span>现在这里有：</span>
             <strong>一些文章</strong>
             <i>/</i>
-            <strong>几个项目</strong>
-            <i>/</i>
             <strong>若干未完成的想法</strong>
             <span className={styles.statusCheck}>●</span>
           </div>

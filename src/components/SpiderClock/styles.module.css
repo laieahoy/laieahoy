@@ -1,0 +1,320 @@
+.wrapper {
+  --ink: #191919;
+  --blue: #0875a8;
+
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 1001;
+
+  width: 118px;
+  height: 150px;
+
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+/* 蜘蛛主体。顶部蛛丝位于主体之外，因此只随主体下坠 */
+.hangingSpider {
+  position: relative;
+
+  width: 118px;
+  height: 150px;
+
+  transform: translateY(0);
+  transform-origin: 59px 0;
+  transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 图片区域不设置边框、阴影或背景 */
+.pictureFrame {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  z-index: 2;
+
+  width: 112px;
+  height: 112px;
+
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+  overflow: visible;
+  pointer-events: auto;
+  transform: translateX(-50%);
+}
+
+.pictureFrame::before,
+.pictureFrame::after {
+  content: none;
+  display: none;
+}
+
+/* 鼠标悬停图片时，蜘蛛侠和时钟一起下坠 */
+.wrapper:hover .hangingSpider,
+.wrapper:has(.pictureFrame:hover) .hangingSpider {
+  transform: translateY(10px);
+}
+
+/* 顶部固定蛛丝 */
+.fixedWeb {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 3;
+
+  width: 3px;
+  height: 27px;
+
+  border-radius: 4px;
+  background: var(--ink);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.spiderImage {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  filter: none;
+  pointer-events: auto;
+  transition: filter 450ms ease;
+}
+
+/* 时钟覆盖层与图片保持相对位置 */
+.clockOverlay {
+  position: absolute;
+  inset: 8px;
+
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+
+  pointer-events: none;
+}
+
+.tick {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-linecap: round;
+  opacity: 0.95;
+}
+
+.hourHand,
+.minuteHand,
+.secondHand {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  stroke-linecap: round;
+}
+
+.hourHand {
+  stroke: #0b1210;
+  stroke-width: 3.6;
+}
+
+.minuteHand {
+  stroke: #0b1210;
+  stroke-width: 2.5;
+}
+
+.secondHand {
+  stroke: #b87908;
+  stroke-width: 1.7;
+}
+
+.pin {
+  fill: #d99b16;
+  stroke: #0b1210;
+  stroke-width: 1.2;
+}
+
+/* 两只手的共同样式 */
+.leftHand,
+.rightHand {
+  position: absolute;
+  top: 69px;
+  z-index: 4;
+
+  width: 31px;
+  height: 7px;
+
+  border-radius: 99px;
+  background: var(--blue);
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    opacity 220ms ease,
+    transform 180ms ease;
+}
+
+.leftHand {
+  left: 5px;
+  transform: translateX(12px) rotate(var(--hand-angle, 0deg));
+  transform-origin: right center;
+}
+
+.rightHand {
+  right: 5px;
+  transform: translateX(-12px) rotate(var(--hand-angle, 0deg));
+  transform-origin: left center;
+}
+
+/* React 根据鼠标方向添加 handVisible */
+.handVisible {
+  opacity: 1;
+}
+
+/* 暗色模式 */
+.wrapper.dark {
+  --ink: #e7ebe7;
+  --blue: #249bd3;
+}
+
+.wrapper.dark .leftHand,
+.wrapper.dark .rightHand {
+  background: var(--blue);
+  box-shadow: 0 0 0 1px rgba(231, 235, 231, 0.45);
+}
+
+.wrapper.dark .spiderImage {
+  filter: brightness(0.28) contrast(1.35) saturate(0.45) sepia(0.1);
+}
+
+.wrapper.dark .tick {
+  stroke: #e7ebe7;
+}
+
+.wrapper.dark .hourHand,
+.wrapper.dark .minuteHand {
+  stroke: #e7ebe7;
+}
+
+.wrapper.dark .secondHand {
+  stroke: #eabf45;
+}
+
+.wrapper.dark .pin {
+  fill: #eabf45;
+  stroke: #e7ebe7;
+}
+
+/* 点击链接时的蛛丝动画 */
+.webAnimation {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+.webLayer {
+  position: fixed;
+  inset: 0;
+
+  display: block;
+  width: 100vw;
+  height: 100vh;
+
+  overflow: visible;
+  pointer-events: none;
+}
+
+.shootingWeb {
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  animation: webAppear 160ms ease-out both;
+}
+
+.webLight .shootingWeb {
+  color: #111827;
+  stroke: #111827;
+  filter:
+    drop-shadow(0 0 1px rgba(0, 0, 0, 0.85))
+    drop-shadow(0 0 3px rgba(0, 0, 0, 0.35));
+}
+
+.webDark .shootingWeb {
+  color: rgba(255, 255, 255, 0.96);
+  stroke: rgba(255, 255, 255, 0.96);
+  filter:
+    drop-shadow(0 0 2px rgba(255, 255, 255, 0.8))
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.35));
+}
+
+@keyframes webAppear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.liftedPreview {
+  position: fixed;
+  z-index: 10000;
+
+  max-width: min(320px, 70vw);
+  max-height: min(240px, 50vh);
+
+  object-fit: contain;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+@media (max-width: 576px) {
+  .wrapper {
+    width: 96px;
+    height: 124px;
+  }
+
+  .hangingSpider {
+    width: 96px;
+    height: 124px;
+    transform-origin: 48px 0;
+  }
+
+  .pictureFrame {
+    top: 18px;
+    width: 92px;
+    height: 92px;
+  }
+
+  .fixedWeb {
+    height: 22px;
+  }
+
+  .wrapper:hover .hangingSpider,
+  .wrapper:has(.pictureFrame:hover) .hangingSpider {
+    transform: translateY(8px);
+  }
+
+  .leftHand,
+  .rightHand {
+    top: 57px;
+    width: 25px;
+    height: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hangingSpider,
+  .spiderImage,
+  .leftHand,
+  .rightHand,
+  .shootingWeb,
+  .liftedPreview {
+    animation: none;
+    transition: none;
+  }
+}
