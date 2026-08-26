@@ -105,28 +105,33 @@ blog: {
           alt: '505 Not Found Logo',
           src: 'img/logo.svg',
         },
-     items: [
-    {
-      to: '/blog',
-      label: '博客',
-      position: 'left',
-    },
-    {
-      to: '/categories',
-      label: '分类',
-      position: 'left',
-    },
-    {
-      to: '/blog/tags',
-      label: '标签',
-      position: 'left',
-    },
-    {
-      to: '/blog/archive',
-      label: '归档',
-      position: 'left',
-    },
-  ],
+        items: [
+          {
+            to: '/blog',
+            label: '博客',
+            position: 'left',
+          },
+          {
+            to: '/categories',
+            label: '分类',
+            position: 'left',
+          },
+          {
+            to: '/blog/tags',
+            label: '标签',
+            position: 'left',
+          },
+          {
+            to: '/blog/archive',
+            label: '归档',
+            position: 'left',
+          },
+          {
+            to: '/write',
+            label: '写文章',
+            position: 'right',
+          },
+        ],
       },
 
       // 页脚

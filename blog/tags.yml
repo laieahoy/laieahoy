@@ -18,22 +18,37 @@ hola:
   permalink: /hola
   description: Hola tag description
 
-algorithm:
+算法:
   label: 算法
-  permalink: /blog/tags/category-algorithm
+  permalink: /算法
   description: 算法题解、竞赛记录和数据结构学习。
 
-dynamic-programming:
-  label: 动态规划
-  permalink: /blog/tags/dynamic-programming
-  description: 动态规划专题文章。
+题解:
+  label: 题解
+  permalink: /题解
+  description: 各类算法题目和竞赛题解。
 
-array:
-  label: 数组
-  permalink: /blog/tags/array
-  description: 数组和双指针专题文章。
+coci:
+  label: coci
+  permalink: /coci
+  description: COCI 相关竞赛题解。
 
-graph:
-  label: 图论
-  permalink: /blog/tags/graph
-  description: 图论和搜索算法专题文章。
+学习笔记:
+  label: 学习笔记
+  permalink: /学习笔记
+  description: 算法学习笔记
+
+前端:
+  label: 前端
+  permalink: /前端
+  description: React、Docusaurus、工程化和浏览器相关内容。
+
+后端:
+  label: 后端
+  permalink: /后端
+  description: 服务端、数据库和接口设计。
+
+生活随笔:
+  label: 生活随笔
+  permalink: /生活随笔
+  description: 学习记录和个人思考。
