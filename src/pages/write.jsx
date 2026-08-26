@@ -28,7 +28,21 @@ function parseTags(value) {
 export default function WritePage() {
   const [form, setForm] = useState(initialForm);
   const [publishing, setPublishing] = useState(false);
+
   const [status, setStatus] = useState({
+    type: '',
+    text: '',
+    commitUrl: '',
+  });
+
+  const [deleteForm, setDeleteForm] = useState({
+    filePath: '',
+    password: '',
+  });
+
+  const [deleting, setDeleting] = useState(false);
+
+  const [deleteStatus, setDeleteStatus] = useState({
     type: '',
     text: '',
     commitUrl: '',
@@ -43,119 +57,214 @@ export default function WritePage() {
     }));
   }
 
-async function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     setStatus({
-        type: '',
-        text: '',
-        commitUrl: '',
+      type: '',
+      text: '',
+      commitUrl: '',
     });
 
     const title = form.title.trim();
+    const description = form.description.trim();
     const content = form.content.trim();
     const tags = parseTags(form.tags);
 
     if (!title) {
-        setStatus({
+      setStatus({
         type: 'error',
         text: '请输入文章标题。',
         commitUrl: '',
-        });
-        return;
+      });
+      return;
     }
 
     if (!content) {
-        setStatus({
+      setStatus({
         type: 'error',
         text: '请输入文章正文。',
         commitUrl: '',
-        });
-        return;
+      });
+      return;
     }
 
     if (!form.password) {
-        setStatus({
+      setStatus({
         type: 'error',
         text: '请输入发布密码。',
         commitUrl: '',
-        });
-        return;
+      });
+      return;
     }
 
     if (tags.length === 0) {
-        setStatus({
+      setStatus({
         type: 'error',
         text: '至少填写一个标签。',
         commitUrl: '',
-        });
-        return;
+      });
+      return;
     }
 
     setPublishing(true);
 
     try {
-        const response = await fetch('/api/publish', {
+      const response = await fetch('/api/publish', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            title,
-            description: form.description.trim(),
-            tags,
-            content,
-            password: form.password,
+          title,
+          description,
+          tags,
+          content,
+          password: form.password,
         }),
-        });
+      });
 
-        const rawText = await response.text();
+      const rawText = await response.text();
 
-        let data = {};
+      let data = {};
 
-        try {
+      try {
         data = rawText ? JSON.parse(rawText) : {};
-        } catch {
+      } catch {
         data = {};
-        }
+      }
 
-        if (!response.ok) {
+      if (!response.ok) {
         if (response.status === 401) {
-            throw new Error(data.message || '发布密码错误。');
+          throw new Error(data.message || '发布密码错误。');
         }
 
         if (response.status === 404) {
-            throw new Error(
+          throw new Error(
             data.message ||
-                '找不到 /api/publish。请使用 Vercel 地址测试，不能直接用 npm start 测试发布。'
-            );
+              '找不到 /api/publish。请使用 Vercel 地址测试发布。'
+          );
         }
 
         throw new Error(
-            data.message || `发布失败，HTTP 状态码：${response.status}`
+          data.message || `发布失败，HTTP 状态码：${response.status}`
         );
-        }
+      }
 
-        setStatus({
+      setStatus({
         type: 'success',
         text: `文章已经提交到 GitHub：${data.filePath}`,
         commitUrl: data.commitUrl || '',
-        });
+      });
 
-        setForm((current) => ({
+      // 发布成功后，自动把文章路径填入删除区域。
+      setDeleteForm({
+        filePath: data.filePath || '',
+        password: '',
+      });
+
+      setForm((current) => ({
         ...current,
         password: '',
-        }));
+      }));
     } catch (error) {
-        setStatus({
+      setStatus({
         type: 'error',
         text: error.message || '发布失败，请稍后重试。',
         commitUrl: '',
-        });
+      });
     } finally {
-        setPublishing(false);
+      setPublishing(false);
     }
+  }
+
+  async function handleDelete(event) {
+    event.preventDefault();
+
+    setDeleteStatus({
+      type: '',
+      text: '',
+      commitUrl: '',
+    });
+
+    const filePath = deleteForm.filePath.trim();
+
+    if (!filePath) {
+      setDeleteStatus({
+        type: 'error',
+        text: '请输入要删除的文章路径。',
+        commitUrl: '',
+      });
+      return;
     }
+
+    if (!deleteForm.password) {
+      setDeleteStatus({
+        type: 'error',
+        text: '请输入发布密码。',
+        commitUrl: '',
+      });
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `确定要删除这篇文章吗？\n\n${filePath}\n\n此操作不可撤销。`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      const response = await fetch('/api/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filePath,
+          password: deleteForm.password,
+        }),
+      });
+
+      const rawText = await response.text();
+
+      let data = {};
+
+      try {
+        data = rawText ? JSON.parse(rawText) : {};
+      } catch {
+        data = {};
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || `删除失败，HTTP 状态码：${response.status}`
+        );
+      }
+
+      setDeleteStatus({
+        type: 'success',
+        text: data.message || '文章删除成功。',
+        commitUrl: data.commitUrl || '',
+      });
+
+      setDeleteForm({
+        filePath: '',
+        password: '',
+      });
+    } catch (error) {
+      setDeleteStatus({
+        type: 'error',
+        text: error.message || '删除失败，请稍后重试。',
+        commitUrl: '',
+      });
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   return (
     <Layout
@@ -296,6 +405,81 @@ async function handleSubmit(event) {
                 </p>
               )}
             </div>
+          </section>
+
+          <section className={`${styles.panel} ${styles.deletePanel}`}>
+            <h2 className={styles.panelTitle}>删除文章</h2>
+
+            <form onSubmit={handleDelete}>
+              <div className={styles.field}>
+                <label htmlFor="delete-file-path">
+                  文章文件路径
+                </label>
+
+                <input
+                  id="delete-file-path"
+                  type="text"
+                  value={deleteForm.filePath}
+                  onChange={(event) =>
+                    setDeleteForm((current) => ({
+                      ...current,
+                      filePath: event.target.value,
+                    }))
+                  }
+                  placeholder="例如：blog/2026-08-26-my-post.md"
+                />
+              </div>
+
+              <div className={styles.field}>
+                <label htmlFor="delete-password">发布密码</label>
+
+                <input
+                  id="delete-password"
+                  type="password"
+                  value={deleteForm.password}
+                  onChange={(event) =>
+                    setDeleteForm((current) => ({
+                      ...current,
+                      password: event.target.value,
+                    }))
+                  }
+                  placeholder="输入 Vercel 中设置的作者密码"
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className={styles.actions}>
+                <button
+                  className={styles.deleteButton}
+                  type="submit"
+                  disabled={deleting}
+                >
+                  {deleting ? '正在删除……' : '删除文章'}
+                </button>
+              </div>
+
+              {deleteStatus.text && (
+                <div
+                  className={
+                    deleteStatus.type === 'success'
+                      ? styles.success
+                      : styles.error
+                  }
+                >
+                  <p>{deleteStatus.text}</p>
+
+                  {deleteStatus.commitUrl && (
+                    <a
+                      href={deleteStatus.commitUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      查看 GitHub 提交
+                    </a>
+                  )}
+                </div>
+              )}
+            </form>
           </section>
         </div>
       </main>

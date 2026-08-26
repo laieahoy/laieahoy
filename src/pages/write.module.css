@@ -100,23 +100,36 @@
   margin-top: 24px;
 }
 
-.publishButton {
+.publishButton,
+.deleteButton {
   min-height: 46px;
   padding: 0 22px;
   border: 0;
   border-radius: 6px;
-  background: var(--ifm-color-primary);
   color: #fff;
   cursor: pointer;
   font: inherit;
   font-weight: 700;
 }
 
+.publishButton {
+  background: var(--ifm-color-primary);
+}
+
 .publishButton:hover {
   background: var(--ifm-color-primary-dark);
 }
 
-.publishButton:disabled {
+.deleteButton {
+  background: #c0394b;
+}
+
+.deleteButton:hover {
+  background: #a52f40;
+}
+
+.publishButton:disabled,
+.deleteButton:disabled {
   cursor: wait;
   opacity: 0.65;
 }
@@ -174,6 +187,10 @@
   overflow-x: auto;
 }
 
+.deletePanel {
+  grid-column: 1 / -1;
+}
+
 @media (max-width: 900px) {
   .page {
     width: 92vw;
@@ -182,6 +199,10 @@
 
   .editorLayout {
     grid-template-columns: 1fr;
+  }
+
+  .deletePanel {
+    grid-column: auto;
   }
 
   .preview {
