@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Layout from '@theme/Layout';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -14,6 +14,20 @@ const initialForm = {
   password: '',
 };
 
+function formatPostDate(date) {
+  if (!date) {
+    return '日期未知';
+  }
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return date;
+  }
+
+  return parsedDate.toLocaleDateString('zh-CN');
+}
+
 function parseTags(value) {
   return [
     ...new Set(
@@ -28,6 +42,36 @@ function parseTags(value) {
 export default function WritePage() {
   const [form, setForm] = useState(initialForm);
   const [publishing, setPublishing] = useState(false);
+  const [posts, setPosts] = useState([]);
+const [loadingPosts, setLoadingPosts] = useState(true);
+const [postsError, setPostsError] = useState('');
+
+async function loadPosts() {
+  setLoadingPosts(true);
+  setPostsError('');
+
+  try {
+    const response = await fetch('/api/posts', {
+      cache: 'no-store',
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || '读取文章列表失败。');
+    }
+
+    setPosts(data.posts || []);
+  } catch (error) {
+    setPostsError(error.message || '读取文章列表失败。');
+  } finally {
+    setLoadingPosts(false);
+  }
+}
+
+useEffect(() => {
+  loadPosts();
+}, []);
 
   const [status, setStatus] = useState({
     type: '',
@@ -158,10 +202,12 @@ export default function WritePage() {
       });
 
       // 发布成功后，自动把文章路径填入删除区域。
-      setDeleteForm({
-        filePath: data.filePath || '',
-        password: '',
-      });
+    setDeleteForm({
+    filePath: data.filePath || '',
+    password: '',
+    });
+
+    await loadPosts();
 
       setForm((current) => ({
         ...current,
@@ -207,8 +253,11 @@ export default function WritePage() {
       return;
     }
 
+    const selectedPost = posts.find((post) => post.filePath === filePath);
+    const postTitle = selectedPost?.title || filePath;
+
     const confirmed = window.confirm(
-      `确定要删除这篇文章吗？\n\n${filePath}\n\n此操作不可撤销。`
+    `确定要删除这篇文章吗？\n\n标题：${postTitle}\n路径：${filePath}\n\n此操作不可撤销。`
     );
 
     if (!confirmed) {
@@ -251,10 +300,12 @@ export default function WritePage() {
         commitUrl: data.commitUrl || '',
       });
 
-      setDeleteForm({
-        filePath: '',
-        password: '',
-      });
+    setDeleteForm({
+    filePath: '',
+    password: '',
+    });
+
+    await loadPosts();
     } catch (error) {
       setDeleteStatus({
         type: 'error',
@@ -481,6 +532,116 @@ export default function WritePage() {
               )}
             </form>
           </section>
+          <section className={`${styles.panel} ${styles.deletePanel}`}>
+  <h2 className={styles.panelTitle}>删除文章</h2>
+
+  <form onSubmit={handleDelete}>
+    <div className={styles.field}>
+      <label htmlFor="delete-file-path">选择要删除的文章</label>
+
+      {loadingPosts ? (
+        <p>正在读取文章列表……</p>
+      ) : postsError ? (
+        <div className={styles.error}>
+          <p>{postsError}</p>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={loadPosts}
+          >
+            重新读取
+          </button>
+        </div>
+      ) : posts.length === 0 ? (
+        <p className={styles.previewPlaceholder}>
+          暂时没有找到文章。
+        </p>
+      ) : (
+        <select
+                id="delete-file-path"
+                value={deleteForm.filePath}
+                onChange={(event) =>
+                    setDeleteForm((current) => ({
+                    ...current,
+                    filePath: event.target.value,
+                    }))
+                }
+                >
+                <option value="">请选择一篇文章</option>
+
+                {posts.map((post) => (
+                    <option key={post.filePath} value={post.filePath}>
+                    {post.title} · {formatPostDate(post.date)}
+                    </option>
+                ))}
+                </select>
+            )}
+            </div>
+
+            {deleteForm.filePath && (
+            <p className={styles.selectedPost}>
+                将删除：
+                <strong>
+                {posts.find(
+                    (post) => post.filePath === deleteForm.filePath
+                )?.title || deleteForm.filePath}
+                </strong>
+                <br />
+                <span>{deleteForm.filePath}</span>
+            </p>
+            )}
+
+            <div className={styles.field}>
+            <label htmlFor="delete-password">发布密码</label>
+
+            <input
+                id="delete-password"
+                type="password"
+                value={deleteForm.password}
+                onChange={(event) =>
+                setDeleteForm((current) => ({
+                    ...current,
+                    password: event.target.value,
+                }))
+                }
+                placeholder="输入 Vercel 中设置的作者密码"
+                autoComplete="off"
+            />
+            </div>
+
+            <div className={styles.actions}>
+            <button
+                className={styles.deleteButton}
+                type="submit"
+                disabled={deleting || posts.length === 0}
+            >
+                {deleting ? '正在删除……' : '删除选中的文章'}
+            </button>
+            </div>
+
+            {deleteStatus.text && (
+            <div
+                className={
+                deleteStatus.type === 'success'
+                    ? styles.success
+                    : styles.error
+                }
+            >
+                <p>{deleteStatus.text}</p>
+
+                {deleteStatus.commitUrl && (
+                <a
+                    href={deleteStatus.commitUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    查看 GitHub 提交
+                </a>
+                )}
+            </div>
+            )}
+        </form>
+        </section>
         </div>
       </main>
     </Layout>
