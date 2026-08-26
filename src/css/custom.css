@@ -442,3 +442,72 @@ textarea::placeholder {
     animation: none !important;
   }
 }
+/*
+ * 只影响博客列表页。
+ * 不会影响首页的蜘蛛侠、吊灯等装饰。
+ */
+
+/* 博客文章卡片 */
+.blog-list-page .theme-blog-post {
+  margin-bottom: 1.25rem;
+  padding: 1.4rem 1.6rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 18px;
+  background: var(--ifm-card-background-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* 鼠标移动到卡片时的效果 */
+.blog-list-page .theme-blog-post:hover {
+  transform: translateY(-4px);
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
+}
+
+/* 标题 */
+.blog-list-page .theme-blog-post h2,
+.blog-list-page .theme-blog-post__title {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+
+/* 只有标题链接可以进入文章 */
+.blog-list-page .theme-blog-post h2 a,
+.blog-list-page .theme-blog-post__title a {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.blog-list-page .theme-blog-post h2 a:hover,
+.blog-list-page .theme-blog-post__title a:hover {
+  color: var(--ifm-color-primary-dark);
+  text-decoration: underline;
+}
+
+/* 博客列表页不显示文章正文 */
+.blog-list-page .theme-blog-post__content,
+.blog-list-page .theme-blog-post-content {
+  display: none !important;
+}
+
+/* 不显示“阅读全文”、标签等底部内容 */
+.blog-list-page .theme-blog-post__footer,
+.blog-list-page .theme-blog-post footer {
+  display: none !important;
+}
+
+/* 日期、作者等元信息 */
+.blog-list-page .theme-blog-post__meta {
+  margin-top: 0.7rem;
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+
+/* 博客列表整体宽度 */
+.blog-list-page .container {
+  max-width: 1120px;
+}

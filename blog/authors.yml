@@ -1,8 +1,4 @@
-admin:
-  name: 管理员
-  title: laieahoy
-  url: https://github.com/laieahoy
-  image_url: /img/avatar.png
+
 yangshun:
   name: Yangshun Tay
   title: Ex-Meta Staff Engineer, Co-founder GreatFrontEnd
@@ -28,3 +24,7 @@ slorber:
     linkedin: sebastienlorber
     github: slorber
     newsletter: https://thisweekinreact.com
+laieahoy:
+  name: laieahoy
+  title: 管理员
+  image_url: /img/avatar.jpg

@@ -17,3 +17,23 @@ hola:
   label: Hola
   permalink: /hola
   description: Hola tag description
+
+algorithm:
+  label: 算法
+  permalink: /blog/tags/category-algorithm
+  description: 算法题解、竞赛记录和数据结构学习。
+
+dynamic-programming:
+  label: 动态规划
+  permalink: /blog/tags/dynamic-programming
+  description: 动态规划专题文章。
+
+array:
+  label: 数组
+  permalink: /blog/tags/array
+  description: 数组和双指针专题文章。
+
+graph:
+  label: 图论
+  permalink: /blog/tags/graph
+  description: 图论和搜索算法专题文章。
