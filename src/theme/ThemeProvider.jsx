@@ -29,6 +29,10 @@ export default function ThemeProvider({children}) {
   useEffect(() => {
     const selectedTheme = getTheme(themeId);
     const root = document.documentElement;
+    // If the selected theme is a Spider variant, force dark color mode
+    if (selectedTheme.id && selectedTheme.id.includes('spider')) {
+      root.setAttribute('data-theme', 'dark');
+    }
 
     root.dataset.siteTheme = selectedTheme.id;
 
