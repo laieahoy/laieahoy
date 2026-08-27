@@ -119,10 +119,10 @@ body::after {
 }
 
 body::before {
-  opacity: 0.9;
+  opacity: 0.82;
   background-color: rgba(0, 0, 0, 0);
   background-image:
-    linear-gradient(180deg, rgba(3, 5, 8, 0.02), rgba(3, 5, 8, 0.06)),
+    linear-gradient(180deg, rgba(3, 5, 8, 0.01), rgba(3, 5, 8, 0.04)),
     url('/img/spider1.webp'),
     url('/img/spider2.webp'),
     url('/img/spider3.webp'),
@@ -159,12 +159,12 @@ body::before {
 
 body::after {
   z-index: -1;
-  opacity: 0.09;
+  opacity: 0.06;
   background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.001), rgba(0, 0, 0, 0.02)),
-    radial-gradient(circle at 20% 15%, rgba(255,255,255,0.05), transparent 22%),
-    radial-gradient(circle at 80% 24%, rgba(255,255,255,0.04), transparent 18%),
-    radial-gradient(circle at 62% 74%, rgba(255,255,255,0.04), transparent 22%);
+    linear-gradient(180deg, rgba(0, 0, 0, 0.0005), rgba(0, 0, 0, 0.015)),
+    radial-gradient(circle at 20% 15%, rgba(255,255,255,0.04), transparent 22%),
+    radial-gradient(circle at 80% 24%, rgba(255,255,255,0.03), transparent 18%),
+    radial-gradient(circle at 62% 74%, rgba(255,255,255,0.03), transparent 22%);
   transform: translate3d(0, calc(var(--scroll-shift, 0px) * -0.2), 0) scale(1.04);
   background-attachment: scroll;
 }
@@ -184,10 +184,10 @@ body::after {
 .markdown,
 #root,
 #__docusaurus {
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
+  background: rgba(10, 13, 16, 0.006) !important;
+  border: 1px solid rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(0.5px);
+  -webkit-backdrop-filter: blur(0.5px);
 }
 
 .blog-wrapper,
@@ -374,11 +374,11 @@ body,
   position: relative;
   height: 64px;
   padding: 0 24px;
-  background: linear-gradient(180deg, rgba(6,8,12,0.24), rgba(6,8,12,0.08));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(6,8,12,0.12), rgba(6,8,12,0.02));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.015);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 100;
 }
 
@@ -387,9 +387,9 @@ body,
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -10px;
-  height: 10px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0));
+  bottom: -8px;
+  height: 8px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0));
   pointer-events: none;
 }
 
@@ -397,9 +397,9 @@ body,
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  background: rgba(9, 12, 16, 0.02);
+  background: rgba(9, 12, 16, 0.004);
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.006);
 }
 
 .navbar__items {
@@ -874,12 +874,12 @@ html[data-site-theme] .blog-list-page {
   width: calc(100% - 32px);
   margin: 0.8rem auto 0;
   padding: 0.7rem 1rem;
-  border: 1px solid rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.01);
   border-radius: 14px;
-  background: linear-gradient(120deg, rgba(10,12,18,0.06), rgba(32,40,49,0.02));
+  background: linear-gradient(120deg, rgba(10,12,18,0.02), rgba(32,40,49,0.01));
   color: rgba(255,255,255,0.92);
-  box-shadow: 0 6px 16px rgba(10, 12, 18, 0.04);
-  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 10px rgba(10, 12, 18, 0.02);
+  backdrop-filter: blur(2px);
   font-size: 0.77rem;
   letter-spacing: 0.04em;
 }
