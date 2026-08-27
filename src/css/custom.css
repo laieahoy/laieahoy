@@ -378,12 +378,13 @@ body,
   position: relative;
   height: 64px;
   padding: 0 24px;
-  background: linear-gradient(180deg, rgba(6,8,12,0.12), rgba(6,8,12,0.02));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.015);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  /* Pure black base with subtle burgundy/top-to-bottom gradient */
+  background: linear-gradient(180deg, #000000 0%, rgba(139,0,0,0.12) 28%, rgba(6,8,12,0.95) 100%);
+  border-bottom: 1px solid rgba(0,0,0,0.45);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  z-index: 100;
+  z-index: 120;
 }
 
 .navbar::after {
@@ -976,13 +977,15 @@ html[data-site-theme='dark-knight-rises'] .theme-story-ribbon {
 }
 
 .page-top-spider {
-  position: fixed;
-  top: 10px;
+  /* 不再固定于视口顶部，改为随文档流定位，滚动时会一同上/下移动 */
+  position: absolute;
+  top: calc(var(--ifm-navbar-height, 64px) + 8px);
   left: 50%;
   width: 248px;
   height: 228px;
   transform: translateX(-50%) scale(0.94);
-  z-index: 130;
+  /* 置于导航栏之下，随页面滚动时不会遮挡顶部导航 */
+  z-index: 30;
   opacity: 1;
   pointer-events: auto;
   cursor: pointer;
