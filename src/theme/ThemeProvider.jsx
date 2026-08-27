@@ -29,8 +29,12 @@ export default function ThemeProvider({children}) {
   useEffect(() => {
     const selectedTheme = getTheme(themeId);
     const root = document.documentElement;
-    // If the selected theme is a Spider variant, force dark color mode
-    if (selectedTheme.id && selectedTheme.id.includes('spider')) {
+    // If the selected theme is a Spider variant or a Batman-style theme, force dark color mode
+    const forceDark =
+      (selectedTheme.id && selectedTheme.id.includes('spider')) ||
+      selectedTheme.character === 'bat-signal';
+
+    if (forceDark) {
       root.setAttribute('data-theme', 'dark');
     }
 
@@ -42,6 +46,23 @@ export default function ThemeProvider({children}) {
     root.style.setProperty('--theme-surface-dark', selectedTheme.surfaceDark);
 
     window.localStorage.setItem(STORAGE_KEY, selectedTheme.id);
+
+    // If this theme requires dark-only, observe any attempts to change `data-theme`
+    // (for example by other UI components or on navigation) and revert back to dark.
+    let observer;
+    if (forceDark) {
+      observer = new MutationObserver(() => {
+        if (document.documentElement.getAttribute('data-theme') !== 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      });
+
+      observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    }
+
+    return () => {
+      if (observer) observer.disconnect();
+    };
   }, [themeId]);
 
   useEffect(() => {
