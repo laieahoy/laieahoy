@@ -95,6 +95,10 @@ body {
   color: var(--site-text);
 }
 
+html {
+  background: #060a0d;
+}
+
 body {
   position: relative;
   min-height: 100vh;
@@ -831,6 +835,32 @@ html[data-theme='dark'][data-site-theme] {
     var(--theme-surface-dark) 78%,
     #000000
   );
+  --ifm-background-color: #070b10;
+  --ifm-background-surface-color: #0b1117;
+  --ifm-card-background-color: rgba(10, 14, 19, 0.72);
+  --ifm-color-emphasis-200: rgba(255,255,255,0.08);
+  --ifm-color-emphasis-300: rgba(255,255,255,0.12);
+  --ifm-color-content: rgba(255,255,255,0.9);
+  --ifm-color-content-secondary: rgba(255,255,255,0.72);
+  --ifm-heading-color: rgba(255,255,255,1);
+}
+
+html[data-theme='dark'] .blog-list-page .theme-blog-post,
+html[data-theme='dark'] .blog-wrapper,
+html[data-theme='dark'] .docMainWrapper,
+html[data-theme='dark'] .markdown,
+html[data-theme='dark'] .main-wrapper > .container,
+html[data-theme='dark'] .blog-list-page .container {
+  background: rgba(10, 14, 19, 0.72) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: rgba(255,255,255,0.9);
+}
+
+html[data-theme='dark'] .blog-list-page .theme-blog-post__title,
+html[data-theme='dark'] .blog-list-page .theme-blog-post h2,
+html[data-theme='dark'] .markdown,
+html[data-theme='dark'] .markdown * {
+  color: rgba(255,255,255,0.92) !important;
 }
 
 html[data-site-theme='minimal-dark'] {
@@ -952,12 +982,18 @@ html[data-site-theme='dark-knight-rises'] .theme-story-ribbon {
   width: 248px;
   height: 228px;
   transform: translateX(-50%) scale(0.94);
-  z-index: 120;
+  z-index: 130;
   opacity: 1;
   pointer-events: auto;
   cursor: pointer;
-  transition: transform 0.35s ease;
-  will-change: transform;
+  transition: transform 0.35s ease, opacity 0.2s ease;
+  will-change: transform, opacity;
+}
+
+html[data-theme='dark'] .page-top-spider,
+html[data-site-theme='spider-man'] .page-top-spider {
+  opacity: 1;
+  visibility: visible;
 }
 
 .page-top-spider.is-launching {
