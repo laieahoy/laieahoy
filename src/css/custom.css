@@ -45,6 +45,8 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+  /* 头部与正文以上区域（hero/banner）纯色背景变量 */
+  --above-bg: #ffffff;
 }
 
 [data-theme="dark"] {
@@ -86,6 +88,7 @@
 
   --ifm-background-color: var(--site-bg);
   --ifm-background-surface-color: var(--site-surface);
+  --above-bg: #000000;
 }
 
 /* 基础页面 */
@@ -385,6 +388,33 @@ body,
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   z-index: 120;
+}
+
+/* 强制头部 / 正文以上区域在亮/暗主题中为纯色，以避免 body::before 背景图渗出 */
+html[data-theme='dark'] .navbar,
+html[data-theme='dark'] .theme-story-ribbon,
+html[data-theme='dark'] .hero,
+html[data-theme='dark'] .banner,
+html[data-theme='dark'] .heroBanner,
+html[data-theme='dark'] .theme-hero,
+html[data-theme='dark'] .banner--hero,
+html[data-theme='dark'] .navbar__inner {
+  background: var(--above-bg) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme='dark']) .navbar,
+html:not([data-theme='dark']) .theme-story-ribbon,
+html:not([data-theme='dark']) .hero,
+html:not([data-theme='dark']) .banner,
+html:not([data-theme='dark']) .heroBanner,
+html:not([data-theme='dark']) .theme-hero,
+html:not([data-theme='dark']) .banner--hero,
+html:not([data-theme='dark']) .navbar__inner {
+  background: var(--above-bg) !important;
+  background-image: none !important;
+  box-shadow: none !important;
 }
 
 .navbar::after {
@@ -976,16 +1006,23 @@ html[data-site-theme='dark-knight-rises'] .theme-story-ribbon {
   font-weight: 800;
 }
 
+/* 默认隐藏，只有在蜘蛛主题下才显示并固定在视口顶部 */
 .page-top-spider {
-  /* 不再固定于视口顶部，改为随文档流定位，滚动时会一同上/下移动 */
-  position: absolute;
-  top: calc(var(--ifm-navbar-height, 64px) + 8px);
+  display: none;
+}
+
+/* 显示在蜘蛛主题：固定在视口，保证可见 */
+html[data-site-theme^='spider'] .page-top-spider,
+html[data-theme='dark'][data-site-theme^='spider'] .page-top-spider,
+html[data-site-theme='spider-man'] .page-top-spider {
+  display: block;
+  position: fixed;
+  top: calc(var(--ifm-navbar-height, 64px) + 6px);
   left: 50%;
   width: 248px;
   height: 228px;
-  transform: translateX(-50%) scale(0.94);
-  /* 置于导航栏之下，随页面滚动时不会遮挡顶部导航 */
-  z-index: 30;
+  transform: translateX(-50%) scale(0.98);
+  z-index: 220;
   opacity: 1;
   pointer-events: auto;
   cursor: pointer;
