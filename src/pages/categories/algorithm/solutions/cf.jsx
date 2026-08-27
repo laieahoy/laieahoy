@@ -6,20 +6,15 @@ import {
   getCategoryPath,
 } from '@site/src/data/categoryTree';
 
-export default function CompetitionCategoryPage() {
-  const pathSegments = [
-    'algorithm',
-    'solutions',
-    'competition',
-  ];
-
+export default function CfCategoryPage() {
+  const pathSegments = ['algorithm', 'solutions', 'cf'];
   const category = findCategory(pathSegments);
   const categoryPath = getCategoryPath(pathSegments);
 
   return (
     <Layout
-      title="比赛题解"
-      description="COCI 与其他竞赛题解"
+      title="CF 题解"
+      description="Codeforces 题解与模板整理"
     >
       <CategoryBrowser
         pathSegments={pathSegments}

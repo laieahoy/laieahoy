@@ -1,15 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import Layout from '@theme/Layout';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import styles from '@site/src/pages/write.module.css';
+import {getCategoryOptions} from '@site/src/data/categoryTree';
 
 const initialForm = {
   title: '',
   description: '',
-  tags: '算法, 题解, coci',
+  tags: '算法, 题解, 比赛',
+  category: 'algorithm/solutions/competition',
   content: '',
   password: '',
 };
@@ -29,196 +31,206 @@ function formatPostDate(date) {
 }
 
 function parseTags(value) {
-  return [
-    ...new Set(
-      value
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean)
-    ),
-  ];
+  return [...new Set((value || '').split(',').map((tag) => tag.trim()).filter(Boolean))];
+}
+
+async function readJsonResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  const trimmed = text.trim();
+
+  if (!trimmed) {
+    return {};
+  }
+
+  if (trimmed.startsWith('<')) {
+    throw new Error('当前环境没有可用的文章 API，建议在 Vercel/后台环境中运行后端服务。');
+  }
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    throw new Error('返回内容不是有效 JSON，可能是本地开发环境没有配置后端 API。');
+  }
 }
 
 export default function WritePage() {
   const [form, setForm] = useState(initialForm);
   const [publishing, setPublishing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [doublePane, setDoublePane] = useState(true);
+  const [selectedFilePath, setSelectedFilePath] = useState('');
   const [posts, setPosts] = useState([]);
-const [loadingPosts, setLoadingPosts] = useState(true);
-const [postsError, setPostsError] = useState('');
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [postsError, setPostsError] = useState('');
+  const [status, setStatus] = useState({ type: '', text: '', commitUrl: '' });
+  const [deleteStatus, setDeleteStatus] = useState({ type: '', text: '', commitUrl: '' });
 
-async function loadPosts() {
-  setLoadingPosts(true);
-  setPostsError('');
+  const categoryOptions = useMemo(() => getCategoryOptions(), []);
+  const selectedPost = posts.find((post) => post.filePath === selectedFilePath) || null;
 
-  try {
-    const response = await fetch('/api/posts', {
-      cache: 'no-store',
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || '读取文章列表失败。');
+  async function loadArticleByPath(filePath) {
+    if (!filePath) {
+      setForm((current) => ({
+        ...current,
+        title: '',
+        description: '',
+        tags: '',
+        category: 'algorithm/solutions/competition',
+        content: '',
+        password: '',
+      }));
+      setSelectedFilePath('');
+      return;
     }
 
-    setPosts(data.posts || []);
-  } catch (error) {
-    setPostsError(error.message || '读取文章列表失败。');
-  } finally {
-    setLoadingPosts(false);
+    setSelectedFilePath(filePath);
+    setDeleteStatus({ type: '', text: '', commitUrl: '' });
+
+    try {
+      const response = await fetch(`/api/post?filePath=${encodeURIComponent(filePath)}`);
+      const data = await readJsonResponse(response);
+
+      if (!response.ok) {
+        throw new Error(data.message || '读取文章失败。');
+      }
+
+      const article = data.post || {};
+      setForm((current) => ({
+        ...current,
+        title: article.title || '',
+        description: article.description || '',
+        tags: Array.isArray(article.tags) ? article.tags.join(', ') : '',
+        category: article.category || current.category || 'algorithm/solutions/competition',
+        content: article.content || '',
+        password: '',
+      }));
+      setStatus({
+        type: 'success',
+        text: `已加载文章：${article.title || filePath}`,
+        commitUrl: '',
+      });
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        text: error.message || '读取文章失败。',
+        commitUrl: '',
+      });
+    }
   }
-}
 
-useEffect(() => {
-  loadPosts();
-}, []);
+  async function loadPosts() {
+    setLoadingPosts(true);
+    setPostsError('');
 
-  const [status, setStatus] = useState({
-    type: '',
-    text: '',
-    commitUrl: '',
-  });
+    try {
+      const response = await fetch('/api/posts', { cache: 'no-store' });
+      const data = await readJsonResponse(response);
 
-  const [deleteForm, setDeleteForm] = useState({
-    filePath: '',
-    password: '',
-  });
+      if (!response.ok) {
+        throw new Error(data.message || '读取文章列表失败。');
+      }
 
-  const [deleting, setDeleting] = useState(false);
+      setPosts(data.posts || []);
+    } catch (error) {
+      setPostsError(error.message || '读取文章列表失败。');
+    } finally {
+      setLoadingPosts(false);
+    }
+  }
 
-  const [deleteStatus, setDeleteStatus] = useState({
-    type: '',
-    text: '',
-    commitUrl: '',
-  });
+  useEffect(() => {
+    loadPosts();
+  }, []);
 
   function handleChange(event) {
-    const {name, value} = event.target;
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
+  }
 
-    setForm((current) => ({
-      ...current,
-      [name]: value,
-    }));
+  async function handleSelectArticle(event) {
+    const filePath = event.target.value;
+    await loadArticleByPath(filePath);
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
-
-    setStatus({
-      type: '',
-      text: '',
-      commitUrl: '',
-    });
+    setStatus({ type: '', text: '', commitUrl: '' });
 
     const title = form.title.trim();
     const description = form.description.trim();
     const content = form.content.trim();
     const tags = parseTags(form.tags);
+    const category = form.category.trim();
 
     if (!title) {
-      setStatus({
-        type: 'error',
-        text: '请输入文章标题。',
-        commitUrl: '',
-      });
+      setStatus({ type: 'error', text: '请输入文章标题。', commitUrl: '' });
       return;
     }
 
     if (!content) {
-      setStatus({
-        type: 'error',
-        text: '请输入文章正文。',
-        commitUrl: '',
-      });
+      setStatus({ type: 'error', text: '请输入文章正文。', commitUrl: '' });
+      return;
+    }
+
+    if (!category) {
+      setStatus({ type: 'error', text: '请选择文章分类。', commitUrl: '' });
       return;
     }
 
     if (!form.password) {
-      setStatus({
-        type: 'error',
-        text: '请输入发布密码。',
-        commitUrl: '',
-      });
+      setStatus({ type: 'error', text: '请输入发布密码。', commitUrl: '' });
       return;
     }
 
     if (tags.length === 0) {
-      setStatus({
-        type: 'error',
-        text: '至少填写一个标签。',
-        commitUrl: '',
-      });
+      setStatus({ type: 'error', text: '至少填写一个标签。', commitUrl: '' });
       return;
     }
 
     setPublishing(true);
 
     try {
-      const response = await fetch('/api/publish', {
+      const endpoint = selectedFilePath ? '/api/update' : '/api/publish';
+      const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          filePath: selectedFilePath,
           title,
           description,
           tags,
+          category,
           content,
           password: form.password,
         }),
       });
 
-      const rawText = await response.text();
-
-      let data = {};
-
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        data = {};
-      }
+      const data = await readJsonResponse(response);
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error(data.message || '发布密码错误。');
+          throw new Error(data.message || '密码错误。');
         }
-
-        if (response.status === 404) {
-          throw new Error(
-            data.message ||
-              '找不到 /api/publish。请使用 Vercel 地址测试发布。'
-          );
-        }
-
-        throw new Error(
-          data.message || `发布失败，HTTP 状态码：${response.status}`
-        );
+        throw new Error(data.message || `保存失败，HTTP 状态码：${response.status}`);
       }
 
+      const savedPath = data.filePath || selectedFilePath;
+      setSelectedFilePath(savedPath);
       setStatus({
         type: 'success',
-        text: `文章已经提交到 GitHub：${data.filePath}`,
+        text: selectedFilePath ? `文章更新成功：${savedPath}` : `文章已发布：${savedPath}`,
         commitUrl: data.commitUrl || '',
       });
 
-      // 发布成功后，自动把文章路径填入删除区域。
-    setDeleteForm({
-    filePath: data.filePath || '',
-    password: '',
-    });
-
-    await loadPosts();
-
-      setForm((current) => ({
-        ...current,
-        password: '',
-      }));
+      await loadPosts();
+      setForm((current) => ({ ...current, password: '' }));
     } catch (error) {
-      setStatus({
-        type: 'error',
-        text: error.message || '发布失败，请稍后重试。',
-        commitUrl: '',
-      });
+      setStatus({ type: 'error', text: error.message || '保存失败，请稍后重试。', commitUrl: '' });
     } finally {
       setPublishing(false);
     }
@@ -226,72 +238,37 @@ useEffect(() => {
 
   async function handleDelete(event) {
     event.preventDefault();
-
-    setDeleteStatus({
-      type: '',
-      text: '',
-      commitUrl: '',
-    });
-
-    const filePath = deleteForm.filePath.trim();
+    const filePath = selectedFilePath;
 
     if (!filePath) {
-      setDeleteStatus({
-        type: 'error',
-        text: '请输入要删除的文章路径。',
-        commitUrl: '',
-      });
-      return;
-    }
-
-    if (!deleteForm.password) {
-      setDeleteStatus({
-        type: 'error',
-        text: '请输入发布密码。',
-        commitUrl: '',
-      });
+      setDeleteStatus({ type: 'error', text: '请先选择或加载一篇要删除的文章。', commitUrl: '' });
       return;
     }
 
     const selectedPost = posts.find((post) => post.filePath === filePath);
-    const postTitle = selectedPost?.title || filePath;
-
-    const confirmed = window.confirm(
-    `确定要删除这篇文章吗？\n\n标题：${postTitle}\n路径：${filePath}\n\n此操作不可撤销。`
-    );
+    const confirmed = window.confirm(`确定要删除这篇文章吗？\n\n标题：${selectedPost?.title || filePath}\n路径：${filePath}\n\n此操作不可撤销。`);
 
     if (!confirmed) {
       return;
     }
 
     setDeleting(true);
+    setDeleteStatus({ type: '', text: '', commitUrl: '' });
 
     try {
       const response = await fetch('/api/delete', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           filePath,
-          password: deleteForm.password,
+          password: form.password,
         }),
       });
 
-      const rawText = await response.text();
-
-      let data = {};
-
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        data = {};
-      }
+      const data = await readJsonResponse(response);
 
       if (!response.ok) {
-        throw new Error(
-          data.message || `删除失败，HTTP 状态码：${response.status}`
-        );
+        throw new Error(data.message || `删除失败，HTTP 状态码：${response.status}`);
       }
 
       setDeleteStatus({
@@ -300,141 +277,135 @@ useEffect(() => {
         commitUrl: data.commitUrl || '',
       });
 
-    setDeleteForm({
-    filePath: '',
-    password: '',
-    });
-
-    await loadPosts();
+      setSelectedFilePath('');
+      setForm((current) => ({ ...initialForm, password: '' }));
+      await loadPosts();
     } catch (error) {
-      setDeleteStatus({
-        type: 'error',
-        text: error.message || '删除失败，请稍后重试。',
-        commitUrl: '',
-      });
+      setDeleteStatus({ type: 'error', text: error.message || '删除失败，请稍后重试。', commitUrl: '' });
     } finally {
       setDeleting(false);
     }
   }
 
   return (
-    <Layout
-      title="写文章"
-      description="在线编写并发布 Markdown 博客文章"
-    >
+    <Layout title="写文章" description="在线编写并发布 Markdown 博客文章">
       <main className={styles.page}>
         <header className={styles.header}>
           <h1>写文章</h1>
-          <p>
-            在这里编写 Markdown，发布后文章会自动保存到 GitHub。
-          </p>
+          <p>在这里编写 Markdown，并支持直接分类、加载已有文章与密码编辑。</p>
         </header>
 
-        <div className={styles.editorLayout}>
-          <form
-            className={styles.panel}
-            onSubmit={handleSubmit}
-          >
-            <h2 className={styles.panelTitle}>文章信息</h2>
+        <div className={styles.workspaceHeader}>
+          <div className={styles.modeToggle}>
+            <button type="button" className={!doublePane ? styles.modeButtonActive : ''} onClick={() => setDoublePane(false)}>
+              单页模式
+            </button>
+            <button type="button" className={doublePane ? styles.modeButtonActive : ''} onClick={() => setDoublePane(true)}>
+              双页模式
+            </button>
+          </div>
+        </div>
+
+        <div className={`${styles.editorLayout} ${doublePane ? '' : styles.singlePane}`}>
+          <form className={styles.panel} onSubmit={handleSubmit}>
+            <h2 className={styles.panelTitle}>{selectedFilePath ? '编辑现有文章' : '新建文章'}</h2>
+
+            <div className={styles.field}>
+              <label htmlFor="article-select">已发布文章</label>
+              <select id="article-select" value={selectedFilePath} onChange={handleSelectArticle}>
+                <option value="">新建文章</option>
+                {posts.map((post) => (
+                  <option key={post.filePath} value={post.filePath}>
+                    {post.title} · {formatPostDate(post.date)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {selectedPost && (
+              <div className={styles.savedArticleCard}>
+                <div>
+                  <strong>{selectedPost.title}</strong>
+                  <span>{formatPostDate(selectedPost.date)}</span>
+                </div>
+                <button type="button" className={styles.secondaryButton} onClick={() => loadArticleByPath(selectedPost.filePath)}>
+                  重新加载编辑
+                </button>
+              </div>
+            )}
 
             <div className={styles.field}>
               <label htmlFor="title">标题</label>
-              <input
-                id="title"
-                name="title"
-                type="text"
-                value={form.title}
-                onChange={handleChange}
-                placeholder="例如：COCI 2023/2024 题解"
-                maxLength={120}
-              />
+              <input id="title" name="title" type="text" value={form.title} onChange={handleChange} placeholder="例如：COCI 2023/2024 题解" maxLength={120} />
             </div>
 
             <div className={styles.field}>
               <label htmlFor="description">文章描述</label>
-              <input
-                id="description"
-                name="description"
-                type="text"
-                value={form.description}
-                onChange={handleChange}
-                placeholder="可选，用于文章摘要"
-                maxLength={300}
-              />
+              <input id="description" name="description" type="text" value={form.description} onChange={handleChange} placeholder="可选，用于文章摘要" maxLength={300} />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="category">分类</label>
+              <select id="category" name="category" value={form.category} onChange={handleChange}>
+                <option value="">请选择分类</option>
+                {categoryOptions.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {`${'　'.repeat(category.depth)}${category.label}`}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className={styles.field}>
               <label htmlFor="tags">
                 标签
-                <span className={styles.labelHint}>
-                  用英文逗号分隔
-                </span>
+                <span className={styles.labelHint}>用英文逗号分隔</span>
               </label>
-
-              <input
-                id="tags"
-                name="tags"
-                type="text"
-                value={form.tags}
-                onChange={handleChange}
-                placeholder="算法, 题解, coci"
-              />
+              <input id="tags" name="tags" type="text" value={form.tags} onChange={handleChange} placeholder="算法, 题解, 比赛" />
             </div>
 
             <div className={styles.field}>
               <label htmlFor="content">Markdown 正文</label>
-              <textarea
-                id="content"
-                name="content"
-                className={styles.contentInput}
-                value={form.content}
-                onChange={handleChange}
-                placeholder={'# 文章标题\n\n开始写文章……'}
-              />
+              <textarea id="content" name="content" className={styles.contentInput} value={form.content} onChange={handleChange} placeholder={'# 文章标题\n\n开始写文章……'} />
             </div>
 
             <div className={styles.field}>
               <label htmlFor="password">发布密码</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={form.password}
-                onChange={handleChange}
-                placeholder="输入 Vercel 中设置的作者密码"
-                autoComplete="off"
-              />
+              <input id="password" name="password" type="password" value={form.password} onChange={handleChange} placeholder="输入 Vercel 中设置的作者密码" autoComplete="off" />
             </div>
 
             <div className={styles.actions}>
-              <button
-                className={styles.publishButton}
-                type="submit"
-                disabled={publishing}
-              >
-                {publishing ? '正在发布……' : '发布到 GitHub'}
+              <button className={styles.publishButton} type="submit" disabled={publishing}>
+                {publishing ? (selectedFilePath ? '正在保存……' : '正在发布……') : (selectedFilePath ? '保存更新' : '发布到 GitHub')}
               </button>
             </div>
 
-            {status.text && (
-              <div
-                className={
-                  status.type === 'success'
-                    ? styles.success
-                    : styles.error
-                }
-              >
-                <p>{status.text}</p>
+            {selectedFilePath && (
+              <div className={styles.deleteActionBar}>
+                <span>编辑中：{selectedFilePath}</span>
+                <button type="button" className={styles.deleteButton} onClick={handleDelete} disabled={deleting || !form.password}>
+                  {deleting ? '正在删除……' : '删除当前文章'}
+                </button>
+              </div>
+            )}
 
-                {status.commitUrl && (
-                  <a
-                    href={status.commitUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    查看 GitHub 提交
-                  </a>
-                )}
+            {postsError && (
+              <div className={styles.error}>
+                <p>{postsError}</p>
+              </div>
+            )}
+
+            {status.text && (
+              <div className={status.type === 'success' ? styles.success : styles.error}>
+                <p>{status.text}</p>
+                {status.commitUrl && <a href={status.commitUrl} target="_blank" rel="noreferrer">查看 GitHub 提交</a>}
+              </div>
+            )}
+
+            {deleteStatus.text && (
+              <div className={deleteStatus.type === 'success' ? styles.success : styles.error}>
+                <p>{deleteStatus.text}</p>
+                {deleteStatus.commitUrl && <a href={deleteStatus.commitUrl} target="_blank" rel="noreferrer">查看 GitHub 提交</a>}
               </div>
             )}
           </form>
@@ -444,131 +415,12 @@ useEffect(() => {
 
             <div className={styles.preview}>
               {form.content.trim() ? (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm, remarkMath]}
-                  rehypePlugins={[rehypeKatex]}
-                >
-                  {form.content}
-                </ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{form.content}</ReactMarkdown>
               ) : (
-                <p className={styles.previewPlaceholder}>
-                  在左侧输入 Markdown 后，这里会显示预览。
-                </p>
+                <p className={styles.previewPlaceholder}>在左侧输入 Markdown 后，这里会显示预览。</p>
               )}
             </div>
           </section>
-
-   
-          <section className={`${styles.panel} ${styles.deletePanel}`}>
-  <h2 className={styles.panelTitle}>删除文章</h2>
-
-  <form onSubmit={handleDelete}>
-    <div className={styles.field}>
-      <label htmlFor="delete-file-path">选择要删除的文章</label>
-
-      {loadingPosts ? (
-        <p>正在读取文章列表……</p>
-      ) : postsError ? (
-        <div className={styles.error}>
-          <p>{postsError}</p>
-          <button
-            type="button"
-            className={styles.secondaryButton}
-            onClick={loadPosts}
-          >
-            重新读取
-          </button>
-        </div>
-      ) : posts.length === 0 ? (
-        <p className={styles.previewPlaceholder}>
-          暂时没有找到文章。
-        </p>
-      ) : (
-        <select
-                id="delete-file-path"
-                value={deleteForm.filePath}
-                onChange={(event) =>
-                    setDeleteForm((current) => ({
-                    ...current,
-                    filePath: event.target.value,
-                    }))
-                }
-                >
-                <option value="">请选择一篇文章</option>
-
-                {posts.map((post) => (
-                    <option key={post.filePath} value={post.filePath}>
-                    {post.title} · {formatPostDate(post.date)}
-                    </option>
-                ))}
-                </select>
-            )}
-            </div>
-
-            {deleteForm.filePath && (
-            <p className={styles.selectedPost}>
-                将删除：
-                <strong>
-                {posts.find(
-                    (post) => post.filePath === deleteForm.filePath
-                )?.title || deleteForm.filePath}
-                </strong>
-                <br />
-                <span>{deleteForm.filePath}</span>
-            </p>
-            )}
-
-            <div className={styles.field}>
-            <label htmlFor="delete-password">发布密码</label>
-
-            <input
-                id="delete-password"
-                type="password"
-                value={deleteForm.password}
-                onChange={(event) =>
-                setDeleteForm((current) => ({
-                    ...current,
-                    password: event.target.value,
-                }))
-                }
-                placeholder="输入 Vercel 中设置的作者密码"
-                autoComplete="off"
-            />
-            </div>
-
-            <div className={styles.actions}>
-            <button
-                className={styles.deleteButton}
-                type="submit"
-                disabled={deleting || posts.length === 0}
-            >
-                {deleting ? '正在删除……' : '删除选中的文章'}
-            </button>
-            </div>
-
-            {deleteStatus.text && (
-            <div
-                className={
-                deleteStatus.type === 'success'
-                    ? styles.success
-                    : styles.error
-                }
-            >
-                <p>{deleteStatus.text}</p>
-
-                {deleteStatus.commitUrl && (
-                <a
-                    href={deleteStatus.commitUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    查看 GitHub 提交
-                </a>
-                )}
-            </div>
-            )}
-        </form>
-        </section>
         </div>
       </main>
     </Layout>

@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const GITHUB_API = 'https://api.github.com';
 
 function sendJson(res, statusCode, payload) {
@@ -12,6 +14,55 @@ function encodeGithubPath(filePath) {
     .split('/')
     .map((part) => encodeURIComponent(part))
     .join('/');
+}
+
+function listLocalMarkdownFiles(rootDir) {
+  const results = [];
+
+  if (!fs.existsSync(rootDir)) {
+    return results;
+  }
+
+  function walk(currentDir) {
+    for (const entry of fs.readdirSync(currentDir, {withFileTypes: true})) {
+      const fullPath = path.join(currentDir, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(fullPath);
+        continue;
+      }
+
+      if (entry.isFile() && /\.mdx?$/i.test(entry.name)) {
+        results.push(fullPath);
+      }
+    }
+  }
+
+  walk(rootDir);
+  return results;
+}
+
+function readLocalPosts() {
+  const rootDir = path.resolve(process.cwd(), 'blog');
+  const files = listLocalMarkdownFiles(rootDir)
+    .filter((filePath) => /(^|\/)blog\//.test(filePath) || filePath.includes(path.sep + 'blog' + path.sep))
+    .filter((filePath) => filePath.endsWith('.md') || filePath.endsWith('.mdx'));
+
+  return files.map((filePath) => {
+    const markdown = fs.readFileSync(filePath, 'utf8');
+    const frontMatter = readFrontMatter(markdown);
+    const relativePath = path.relative(process.cwd(), filePath).replace(/\\/g, '/');
+
+    return {
+      title: frontMatter.title || path.basename(filePath, path.extname(filePath)),
+      date: frontMatter.date || '',
+      filePath: relativePath,
+    };
+  }).sort((a, b) => {
+    const first = new Date(b.date || 0).getTime();
+    const second = new Date(a.date || 0).getTime();
+    return first - second;
+  });
 }
 
 async function githubRequest(endpoint) {
@@ -85,6 +136,12 @@ module.exports = async function postsHandler(req, res) {
   );
 
   if (missingVariable) {
+    const localPosts = readLocalPosts();
+
+    if (localPosts.length > 0) {
+      return sendJson(res, 200, { posts: localPosts });
+    }
+
     return sendJson(res, 500, {
       message: `Vercel 缺少环境变量：${missingVariable}`,
     });

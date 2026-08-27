@@ -16,16 +16,7 @@ export default function UserMenu() {
   }
 
   if (!user) {
-    return (
-      <>
-        <Link className="navbar__item navbar__link" to="/login">
-          登录
-        </Link>
-        <Link className="navbar__item navbar__link" to="/register">
-          注册
-        </Link>
-      </>
-    );
+    return null;
   }
 
   return (

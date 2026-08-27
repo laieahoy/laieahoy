@@ -6,20 +6,15 @@ import {
   getCategoryPath,
 } from '@site/src/data/categoryTree';
 
-export default function CompetitionCategoryPage() {
-  const pathSegments = [
-    'algorithm',
-    'solutions',
-    'competition',
-  ];
-
+export default function AlgorithmNotesDataStructurePage() {
+  const pathSegments = ['algorithm', 'notes', 'data-structure'];
   const category = findCategory(pathSegments);
   const categoryPath = getCategoryPath(pathSegments);
 
   return (
     <Layout
-      title="比赛题解"
-      description="COCI 与其他竞赛题解"
+      title="数据结构笔记"
+      description="栈、队列、树与堆的结构化理解"
     >
       <CategoryBrowser
         pathSegments={pathSegments}

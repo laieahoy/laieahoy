@@ -1,24 +1,112 @@
+export const categoryArticles = [
+  {
+    title: 'COCI 2023/2024 5题解',
+    description: 'COCI 2023/2024 部分题目解析。',
+    categoryPath: 'algorithm/solutions/competition',
+    url: '/blog/2026/08/25/算法/题解/',
+  },
+  {
+    title: 'COCI 2016/2017 部分题目题解',
+    description: 'COCI 2016/2017 部分题目解析。',
+    categoryPath: 'algorithm/solutions/competition',
+    url: '/blog/2026/08/26/算法/题解/',
+  },
+];
+
 export const topCategories = [
   {
     slug: 'algorithm',
     label: '算法',
     tag: '算法',
-    description: '算法题解、竞赛记录和数据结构学习。',
-    count: 2,
+    description: '算法题解、竞赛记录和知识沉淀。',
+    count: 0,
     children: [
       {
         slug: 'solutions',
         label: '题解',
         tag: '题解',
         description: '各类算法题目和竞赛题解。',
-        count: 2,
+        count: 0,
         children: [
           {
-            slug: 'coci',
-            label: 'COCI',
-            tag: 'coci',
-            description: 'COCI 相关竞赛题解。',
-            count: 2,
+            slug: 'cf',
+            label: 'CF',
+            tag: 'cf',
+            description: 'Codeforces 相关题解与模板。',
+            count: 0,
+            children: [],
+          },
+          {
+            slug: 'at',
+            label: 'AT',
+            tag: 'at',
+            description: 'AtCoder 相关题解与训练记录。',
+            count: 0,
+            children: [],
+          },
+          {
+            slug: 'luogu',
+            label: '洛谷',
+            tag: 'luogu',
+            description: '洛谷题解与专题整理。',
+            count: 0,
+            children: [],
+          },
+          {
+            slug: 'competition',
+            label: '比赛',
+            tag: 'competition',
+            description: 'COCI 与其他竞赛的解题总结。',
+            count: 0,
+            children: [],
+          },
+        ],
+      },
+      {
+        slug: 'notes',
+        label: '笔记',
+        tag: '笔记',
+        description: '算法学习、模板和复盘总结。',
+        count: 0,
+        children: [
+          {
+            slug: 'dp',
+            label: 'DP',
+            tag: 'dp',
+            description: '动态规划思路与状态转移。',
+            count: 0,
+            children: [],
+          },
+          {
+            slug: 'graph',
+            label: '图论',
+            tag: '图论',
+            description: '图搜索、最短路和拓扑结构。',
+            count: 0,
+            children: [],
+          },
+          {
+            slug: 'number-theory',
+            label: '数论',
+            tag: '数论',
+            description: '素数、模运算与同余问题。',
+            count: 0,
+            children: [],
+          },
+          {
+            slug: 'data-structure',
+            label: '数据结构',
+            tag: '数据结构',
+            description: '栈、队列、树与堆的结构化理解。',
+            count: 0,
+            children: [],
+          },
+          {
+            slug: 'combinatorics',
+            label: '组合计数',
+            tag: '组合计数',
+            description: '排列组合与计数方法归纳。',
+            count: 0,
             children: [],
           },
         ],
@@ -51,14 +139,56 @@ export const topCategories = [
   },
 ];
 
+function attachArticleMetadata(list, parentPath = []) {
+  list.forEach((category) => {
+    const path = [...parentPath, category.slug];
+    const directArticles = categoryArticles.filter(
+      (article) => article.categoryPath === path.join('/')
+    );
+    category.articles = directArticles;
+
+    if (category.children?.length) {
+      attachArticleMetadata(category.children, path);
+    }
+
+    const childTotal = (category.children || []).reduce(
+      (sum, child) => sum + (child.count || 0),
+      0
+    );
+    category.count = directArticles.length + childTotal;
+  });
+
+  return list;
+}
+
+attachArticleMetadata(topCategories);
+
+export const categoryLookup = new Map();
+
+function registerCategory(category, stack = []) {
+  const path = [...stack, category.slug];
+  categoryLookup.set(path.join('/'), category);
+
+  (category.children || []).forEach((child) => registerCategory(child, path));
+}
+
+topCategories.forEach((category) => registerCategory(category));
+
+export function getCategoryArticles(pathSegments) {
+  const category = findCategory(pathSegments);
+  if (!category) {
+    return [];
+  }
+
+  return [...(category.articles || [])];
+}
+
 export function findCategory(pathSegments) {
   let currentList = topCategories;
   let current = null;
 
   for (const segment of pathSegments) {
-    current = currentList.find(
-      (category) => category.slug === segment
-    );
+    current = currentList.find((category) => category.slug === segment);
 
     if (!current) {
       return null;
@@ -75,9 +205,7 @@ export function getCategoryPath(pathSegments) {
   let currentList = topCategories;
 
   for (const segment of pathSegments) {
-    const current = currentList.find(
-      (category) => category.slug === segment
-    );
+    const current = currentList.find((category) => category.slug === segment);
 
     if (!current) {
       break;
@@ -88,4 +216,41 @@ export function getCategoryPath(pathSegments) {
   }
 
   return path;
+}
+
+export function normalizeCategoryPath(value) {
+  if (!value) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.filter(Boolean);
+  }
+
+  return String(value)
+    .split('/')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+export function getCategoryOptions() {
+  const result = [];
+
+  function walk(list, path = []) {
+    list.forEach((category) => {
+      const nextPath = [...path, category.slug];
+      result.push({
+        value: nextPath.join('/'),
+        label: path.length === 0 ? category.label : `${path.map((item) => item).join(' / ')} / ${category.label}`,
+        depth: path.length,
+      });
+
+      if (category.children?.length) {
+        walk(category.children, nextPath);
+      }
+    });
+  }
+
+  walk(topCategories);
+  return result;
 }

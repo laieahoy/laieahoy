@@ -7,12 +7,7 @@ import {
 } from '@site/src/data/categoryTree';
 
 export default function CompetitionCategoryPage() {
-  const pathSegments = [
-    'algorithm',
-    'solutions',
-    'competition',
-  ];
-
+  const pathSegments = ['algorithm', 'solutions', 'competition'];
   const category = findCategory(pathSegments);
   const categoryPath = getCategoryPath(pathSegments);
 

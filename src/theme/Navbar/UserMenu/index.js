@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Link from '@docusaurus/Link';
 import { getCurrentUser, logoutUser } from '@site/src/utils/auth';
 
 export default function UserMenu() {
@@ -9,13 +10,7 @@ export default function UserMenu() {
   }, []);
 
   if (!user) {
-    return (
-      <div>
-        <a href="/login">登录</a>
-        <span> / </span>
-        <a href="/register">注册</a>
-      </div>
-    );
+    return null;
   }
 
   function handleLogout() {
@@ -26,7 +21,7 @@ export default function UserMenu() {
 
   return (
     <div>
-      <a href="/profile">{user.username}</a>
+      <Link to="/profile">{user.username}</Link>
       <button type="button" onClick={handleLogout}>登出</button>
     </div>
   );
