@@ -81,11 +81,11 @@ function encodeGithubPath(filePath) {
 function yamlString(value) {
   return JSON.stringify(String(value || ''));
 }
-
 function buildMarkdown({
   title,
   description,
   tags,
+  category,
   content,
   date,
 }) {
@@ -94,6 +94,7 @@ function buildMarkdown({
     `title: ${yamlString(title)}`,
     `description: ${yamlString(description)}`,
     `date: ${date}`,
+    `category: ${yamlString(category)}`,
     'tags:',
     ...tags.map((tag) => `  - ${yamlString(tag)}`),
     '---',
@@ -165,11 +166,12 @@ module.exports = async function publishHandler(req, res) {
 
   const body = getBody(req);
 
-  const title = String(body.title || '').trim();
-  const description = String(body.description || '').trim();
-  const content = String(body.content || '').trim();
-  const tags = normalizeTags(body.tags);
-  const password = String(body.password || '');
+const title = String(body.title || '').trim();
+const description = String(body.description || '').trim();
+const content = String(body.content || '').trim();
+const tags = normalizeTags(body.tags);
+const category = String(body.category || '').trim();
+const password = String(body.password || '');
 
   if (!isCorrectPassword(password, process.env.EDITOR_PASSWORD)) {
     return sendJson(res, 401, {
@@ -201,11 +203,17 @@ module.exports = async function publishHandler(req, res) {
     });
   }
 
-  if (tags.length === 0) {
-    return sendJson(res, 400, {
-      message: '至少需要一个标签。',
-    });
-  }
+if (tags.length === 0) {
+  return sendJson(res, 400, {
+    message: '至少需要一个标签。',
+  });
+}
+
+if (!category) {
+  return sendJson(res, 400, {
+    message: '文章分类不能为空。',
+  });
+}
 
   const owner = process.env.GITHUB_OWNER.trim();
   const repository = process.env.GITHUB_REPO.trim();
@@ -216,13 +224,14 @@ module.exports = async function publishHandler(req, res) {
   const slug = makeSlug(title);
   const filePath = `blog/${date}-${slug}.md`;
 
-  const markdown = buildMarkdown({
-    title,
-    description,
-    tags,
-    content,
-    date: now.toISOString(),
-  });
+const markdown = buildMarkdown({
+  title,
+  description,
+  tags,
+  category,
+  content,
+  date: now.toISOString(),
+});
 
   const githubPath = encodeGithubPath(filePath);
   const endpoint =

@@ -25,6 +25,7 @@ function getBody(req) {
   return {};
 }
 
+
 function isCorrectPassword(input, expected) {
   if (!expected) {
     return false;
@@ -121,11 +122,11 @@ module.exports = async function deleteHandler(req, res) {
   }
 
   // 只允许删除 blog 目录中的 Markdown 文件。
-  if (!/^blog\/[A-Za-z0-9._\-/]+\.(md|mdx)$/.test(filePath)) {
-    return sendJson(res, 400, {
-      message: '文章路径无效，只能删除 blog 目录中的 .md 或 .mdx 文件。',
-    });
-  }
+if (!isValidBlogPath(filePath)) {
+  return sendJson(res, 400, {
+    message: '文章路径无效，只能删除 blog 目录中的 .md 或 .mdx 文件。',
+  });
+}
 
   const owner = process.env.GITHUB_OWNER.trim();
   const repository = process.env.GITHUB_REPO.trim();

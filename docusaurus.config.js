@@ -25,12 +25,12 @@ const config = {
 
   // 正式部署地址
   // 本地开发时可以暂时保留当前配置
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://laieahoy.example.com',
   baseUrl: '/',
 
   // GitHub Pages 配置
-  organizationName: 'your-github-name',
-  projectName: 'your-repository-name',
+  organizationName: 'laieahoy',
+  projectName: 'laieahoy',
 
   onBrokenLinks: 'warn',
 
@@ -166,7 +166,7 @@ blog: {
             items: [
               {
                 label: 'GitHub 项目',
-                href: 'https://github.com/你的用户名/你的仓库名',
+                href: 'https://github.com/laieahoy/laieahoy',
               },
             ],
           },

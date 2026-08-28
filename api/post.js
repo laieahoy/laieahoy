@@ -11,7 +11,13 @@ function sendJson(res, statusCode, payload) {
 function encodeGithubPath(filePath) {
   return filePath.split('/').map((part) => encodeURIComponent(part)).join('/');
 }
-
+function isValidBlogPath(filePath) {
+  return (
+    /^blog\/[A-Za-z0-9._\-/]+\.(md|mdx)$/i.test(filePath) &&
+    !filePath.split('/').includes('..') &&
+    !filePath.includes('//')
+  );
+}
 function readFrontMatter(markdown) {
   const match = markdown.match(/^---\s*([\s\S]*?)\s*---/);
   if (!match) {
@@ -92,10 +98,20 @@ module.exports = async function postHandler(req, res) {
     return sendJson(res, 405, { message: '只允许使用 GET 请求。' });
   }
 
-  const { filePath } = req.query || {};
-  if (!filePath) {
-    return sendJson(res, 400, { message: '缺少文章路径参数。' });
-  }
+const { filePath } = req.query || {};
+const normalizedFilePath = String(filePath || '').trim();
+
+if (!normalizedFilePath) {
+  return sendJson(res, 400, {
+    message: '缺少文章路径参数。',
+  });
+}
+
+if (!isValidBlogPath(normalizedFilePath)) {
+  return sendJson(res, 400, {
+    message: '文章路径无效。',
+  });
+}
 
   const hasGitHubConfig =
     process.env.GITHUB_TOKEN &&
@@ -104,7 +120,7 @@ module.exports = async function postHandler(req, res) {
 
   if (!hasGitHubConfig) {
     try {
-      const post = readLocalPost(String(filePath));
+readLocalPost(normalizedFilePath)
       return sendJson(res, 200, { post });
     } catch (error) {
       return sendJson(res, 404, { message: `读取文章失败：${error.message}` });
@@ -117,7 +133,7 @@ module.exports = async function postHandler(req, res) {
 
   try {
     const content = await githubRequest(
-      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/contents/${encodeGithubPath(String(filePath))}?ref=${encodeURIComponent(branch)}`
+      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/contents/${encodeGithubPath(normalizedFilePath)}?ref=${encodeURIComponent(branch)}`
     );
 
     const markdown = Buffer.from(content.content || '', 'base64').toString('utf8');

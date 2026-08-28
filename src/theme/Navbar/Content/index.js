@@ -1,4 +1,3 @@
-import UserMenu from '@site/src/components/UserMenu';
 import React from 'react';
 import clsx from 'clsx';
 import {
@@ -81,7 +80,6 @@ right={
   // Ask the user to add the respective navbar items => more flexible
   <>
     <NavbarItems items={rightItems} />
-    <UserMenu />
     <NavbarColorModeToggle className={styles.colorModeToggle} />
     {!searchBarItem && (
       <NavbarSearch>

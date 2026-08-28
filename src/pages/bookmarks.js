@@ -11,11 +11,6 @@ export default function BookmarksPage() {
   useEffect(() => {
     const user = getCurrentUser();
 
-    if (!user) {
-      window.location.assign('/login');
-      return;
-    }
-
     const bookmarkIds = getBookmarks(user.id);
     setPosts(blogPosts.filter((post) => bookmarkIds.includes(post.id)));
   }, []);

@@ -63,8 +63,9 @@ export default function WritePage() {
   const [publishing, setPublishing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [doublePane, setDoublePane] = useState(true);
-  const [selectedFilePath, setSelectedFilePath] = useState('');
-  const [posts, setPosts] = useState([]);
+const [selectedFilePath, setSelectedFilePath] = useState('');
+const [originalDate, setOriginalDate] = useState('');
+const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [postsError, setPostsError] = useState('');
   const [status, setStatus] = useState({ type: '', text: '', commitUrl: '' });
@@ -74,19 +75,22 @@ export default function WritePage() {
   const selectedPost = posts.find((post) => post.filePath === selectedFilePath) || null;
 
   async function loadArticleByPath(filePath) {
-    if (!filePath) {
-      setForm((current) => ({
-        ...current,
-        title: '',
-        description: '',
-        tags: '',
-        category: 'algorithm/solutions/competition',
-        content: '',
-        password: '',
-      }));
-      setSelectedFilePath('');
-      return;
-    }
+ if (!filePath) {
+  setOriginalDate('');
+
+  setForm((current) => ({
+    ...current,
+    title: '',
+    description: '',
+    tags: '',
+    category: 'algorithm/solutions/competition',
+    content: '',
+    password: '',
+  }));
+
+  setSelectedFilePath('');
+  return;
+}
 
     setSelectedFilePath(filePath);
     setDeleteStatus({ type: '', text: '', commitUrl: '' });
@@ -100,6 +104,7 @@ export default function WritePage() {
       }
 
       const article = data.post || {};
+      setOriginalDate(article.date || '');
       setForm((current) => ({
         ...current,
         title: article.title || '',
@@ -204,9 +209,10 @@ export default function WritePage() {
           title,
           description,
           tags,
-          category,
-          content,
-          password: form.password,
+         category,
+content,
+date: originalDate,
+password: form.password,
         }),
       });
 
@@ -278,7 +284,13 @@ export default function WritePage() {
       });
 
       setSelectedFilePath('');
-      setForm((current) => ({ ...initialForm, password: '' }));
+setOriginalDate('');
+setSelectedFilePath('');
+
+setForm((current) => ({
+  ...initialForm,
+  password: '',
+}));
       await loadPosts();
     } catch (error) {
       setDeleteStatus({ type: 'error', text: error.message || '删除失败，请稍后重试。', commitUrl: '' });

@@ -44,25 +44,39 @@ function listLocalMarkdownFiles(rootDir) {
 
 function readLocalPosts() {
   const rootDir = path.resolve(process.cwd(), 'blog');
+
   const files = listLocalMarkdownFiles(rootDir)
-    .filter((filePath) => /(^|\/)blog\//.test(filePath) || filePath.includes(path.sep + 'blog' + path.sep))
-    .filter((filePath) => filePath.endsWith('.md') || filePath.endsWith('.mdx'));
+    .filter((filePath) => {
+      const relativePath = path
+        .relative(process.cwd(), filePath)
+        .replace(/\\/g, '/');
 
-  return files.map((filePath) => {
-    const markdown = fs.readFileSync(filePath, 'utf8');
-    const frontMatter = readFrontMatter(markdown);
-    const relativePath = path.relative(process.cwd(), filePath).replace(/\\/g, '/');
+      return relativePath.startsWith('blog/');
+    })
+    .filter((filePath) => /\.(md|mdx)$/i.test(filePath));
 
-    return {
-      title: frontMatter.title || path.basename(filePath, path.extname(filePath)),
-      date: frontMatter.date || '',
-      filePath: relativePath,
-    };
-  }).sort((a, b) => {
-    const first = new Date(b.date || 0).getTime();
-    const second = new Date(a.date || 0).getTime();
-    return first - second;
-  });
+  return files
+    .map((filePath) => {
+      const markdown = fs.readFileSync(filePath, 'utf8');
+      const frontMatter = readFrontMatter(markdown);
+      const relativePath = path
+        .relative(process.cwd(), filePath)
+        .replace(/\\/g, '/');
+
+      return {
+        title:
+          frontMatter.title ||
+          path.basename(filePath, path.extname(filePath)),
+        date: frontMatter.date || '',
+        filePath: relativePath,
+      };
+    })
+    .sort((a, b) => {
+      const first = new Date(b.date || 0).getTime();
+      const second = new Date(a.date || 0).getTime();
+
+      return first - second;
+    });
 }
 
 async function githubRequest(endpoint) {
@@ -163,7 +177,7 @@ module.exports = async function postsHandler(req, res) {
       (item) =>
         item.type === 'blob' &&
         item.path.startsWith('blog/') &&
-        item.path.endsWith('.md')
+        /\.(md|mdx)$/i.test(item.path)
     );
 
     const posts = await Promise.all(

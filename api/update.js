@@ -43,6 +43,13 @@ function normalizeTags(value) {
   const rawTags = Array.isArray(value) ? value : String(value || '').split(',');
   return [...new Set(rawTags.map((tag) => String(tag).replace(/[\r\n]/g, ' ').trim()).filter(Boolean))].slice(0, 20);
 }
+function isValidBlogPath(filePath) {
+  return (
+    /^blog\/[A-Za-z0-9._\-/]+\.(md|mdx)$/i.test(filePath) &&
+    !filePath.split('/').includes('..') &&
+    !filePath.includes('//')
+  );
+}
 
 function encodeGithubPath(filePath) {
   return filePath.split('/').map((part) => encodeURIComponent(part)).join('/');
@@ -115,11 +122,17 @@ module.exports = async function updateHandler(req, res) {
   const body = getBody(req);
   const filePath = String(body.filePath || '').trim();
   const title = String(body.title || '').trim();
+  if (filePath && !isValidBlogPath(filePath)) {
+  return sendJson(res, 400, {
+    message: '文章路径无效，只能更新 blog 目录中的 .md 或 .mdx 文件。',
+  });
+}
   const description = String(body.description || '').trim();
   const content = String(body.content || '').trim();
   const tags = normalizeTags(body.tags);
-  const category = String(body.category || '').trim();
-  const password = String(body.password || '');
+const category = String(body.category || '').trim();
+const date = String(body.date || '').trim();
+const password = String(body.password || '');
 
   if (!isCorrectPassword(password, process.env.EDITOR_PASSWORD)) {
     return sendJson(res, 401, { message: '发布密码错误。' });
@@ -136,11 +149,27 @@ module.exports = async function updateHandler(req, res) {
   if (!category) {
     return sendJson(res, 400, { message: '文章分类不能为空。' });
   }
+  if (date && Number.isNaN(Date.parse(date))) {
+  return sendJson(res, 400, {
+    message: '文章日期格式无效。',
+  });
+}
 
   const owner = process.env.GITHUB_OWNER.trim();
   const repository = process.env.GITHUB_REPO.trim();
   const branch = (process.env.GITHUB_BRANCH || 'main').trim();
-  const targetPath = filePath || `blog/${new Date().toISOString().slice(0, 10)}-${title.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '-').replace(/^-+|-+$/g, '') || 'post'}.md`;
+const slug = title
+  .normalize('NFKD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
+  .replace(/^-+|-+$/g, '')
+  .slice(0, 80)
+  .replace(/-+$/g, '') || 'post';
+
+const targetPath =
+  filePath ||
+  `blog/${new Date().toISOString().slice(0, 10)}-${slug}.md`;
 
   const markdown = buildMarkdown({
     title,
@@ -148,22 +177,38 @@ module.exports = async function updateHandler(req, res) {
     tags,
     category,
     content,
-    date: new Date().toISOString(),
+    date: date || new Date().toISOString(),
   });
 
   try {
-    const githubPath = encodeGithubPath(targetPath);
-    const endpoint = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/contents/${githubPath}`;
-    const result = await githubRequest(endpoint, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: filePath ? `更新文章：${title}` : `发布文章：${title}`,
-        content: Buffer.from(markdown, 'utf8').toString('base64'),
-        branch,
-        ...(filePath ? { sha: (await githubRequest(`${endpoint}?ref=${encodeURIComponent(branch)}`)).sha } : {}),
-      }),
-    });
+const githubPath = encodeGithubPath(targetPath);
+const endpoint =
+  `/repos/${encodeURIComponent(owner)}` +
+  `/${encodeURIComponent(repository)}` +
+  `/contents/${githubPath}`;
+
+let sha;
+
+if (filePath) {
+  const existingFile = await githubRequest(
+    `${endpoint}?ref=${encodeURIComponent(branch)}`
+  );
+
+  sha = existingFile.sha;
+}
+
+const result = await githubRequest(endpoint, {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    message: filePath ? `更新文章：${title}` : `发布文章：${title}`,
+    content: Buffer.from(markdown, 'utf8').toString('base64'),
+    branch,
+    ...(sha ? { sha } : {}),
+  }),
+});
 
     return sendJson(res, 200, {
       message: filePath ? '文章更新成功。' : '文章发布成功。',

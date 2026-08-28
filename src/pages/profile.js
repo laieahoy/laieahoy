@@ -14,11 +14,6 @@ export default function ProfilePage() {
   useEffect(() => {
     const currentUser = getCurrentUser();
 
-    if (!currentUser) {
-      window.location.assign('/login');
-      return;
-    }
-
     setUser(currentUser);
     setUsername(currentUser.username);
     setBio(currentUser.bio || '');
