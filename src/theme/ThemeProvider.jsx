@@ -40,11 +40,13 @@ export default function ThemeProvider({children}) {
     const forceDark =
       (selectedTheme.id && selectedTheme.id.includes('spider')) ||
       selectedTheme.character === 'bat-signal';
+    const themeIsDark =
+      forceDark ||
+      selectedTheme.id?.includes('minimal-dark') ||
+      selectedTheme.id?.includes('dark') ||
+      selectedTheme.nightMode === '暗色版';
 
-    if (forceDark) {
-      root.setAttribute('data-theme', 'dark');
-    }
-
+    root.setAttribute('data-theme', themeIsDark ? 'dark' : 'light');
     root.dataset.siteTheme = selectedTheme.id;
 
     root.style.setProperty('--theme-accent', selectedTheme.accent);
@@ -55,7 +57,7 @@ export default function ThemeProvider({children}) {
     window.localStorage.setItem(STORAGE_KEY, selectedTheme.id);
 
     let observer;
-    if (forceDark) {
+    if (forceDark || themeIsDark) {
       observer = new MutationObserver(() => {
         if (document.documentElement.getAttribute('data-theme') !== 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
