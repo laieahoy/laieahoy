@@ -214,6 +214,14 @@ body::after {
   color: rgba(255, 255, 255, 0.8);
 }
 
+html[data-site-theme]:not([data-site-theme='minimal-light']) {
+  --site-text: #edf3fb;
+  --site-text-soft: #d1dde9;
+  --site-border: rgba(255, 255, 255, 0.12);
+  --site-card: rgba(12, 18, 25, 0.78);
+  --site-button-text: #f6f9ff;
+}
+
 html[data-site-theme='spider-man'] {
   --site-bg: #0b1015;
   --site-surface: #101821;
