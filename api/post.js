@@ -12,11 +12,25 @@ function encodeGithubPath(filePath) {
   return filePath.split('/').map((part) => encodeURIComponent(part)).join('/');
 }
 function isValidBlogPath(filePath) {
-  return (
-    /^blog\/[A-Za-z0-9._\-/]+\.(md|mdx)$/i.test(filePath) &&
-    !filePath.split('/').includes('..') &&
-    !filePath.includes('//')
-  );
+  const normalized = String(filePath || '').replace(/\\/g, '/').trim();
+
+  if (!normalized || !normalized.startsWith('blog/')) {
+    return false;
+  }
+
+  if (normalized.includes('//') || normalized.includes('..')) {
+    return false;
+  }
+
+  const segments = normalized.split('/');
+
+  if (segments.some((segment) => segment === '' || segment === '.' || segment === '..')) {
+    return false;
+  }
+
+  const lastSegment = segments[segments.length - 1];
+
+  return /^[^/]+\.(md|mdx)$/i.test(lastSegment);
 }
 function readFrontMatter(markdown) {
   const match = markdown.match(/^---\s*([\s\S]*?)\s*---/);

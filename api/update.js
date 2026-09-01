@@ -44,11 +44,25 @@ function normalizeTags(value) {
   return [...new Set(rawTags.map((tag) => String(tag).replace(/[\r\n]/g, ' ').trim()).filter(Boolean))].slice(0, 20);
 }
 function isValidBlogPath(filePath) {
-  return (
-    /^blog\/[A-Za-z0-9._\-/]+\.(md|mdx)$/i.test(filePath) &&
-    !filePath.split('/').includes('..') &&
-    !filePath.includes('//')
-  );
+  const normalized = String(filePath || '').replace(/\\/g, '/').trim();
+
+  if (!normalized || !normalized.startsWith('blog/')) {
+    return false;
+  }
+
+  if (normalized.includes('//') || normalized.includes('..')) {
+    return false;
+  }
+
+  const segments = normalized.split('/');
+
+  if (segments.some((segment) => segment === '' || segment === '.' || segment === '..')) {
+    return false;
+  }
+
+  const lastSegment = segments[segments.length - 1];
+
+  return /^[^/]+\.(md|mdx)$/i.test(lastSegment);
 }
 
 function encodeGithubPath(filePath) {
