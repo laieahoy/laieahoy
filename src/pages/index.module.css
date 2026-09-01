@@ -67,12 +67,22 @@
 }
 
 .robot {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-left: 0.15em;
   font-size: 0.58em;
   letter-spacing: 0;
   transform: rotate(5deg);
   animation: floatSpider 2.4s ease-in-out infinite alternate;
+}
+
+.batmanBadge {
+  display: block;
+  width: 0.78em;
+  height: 0.78em;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(255, 210, 98, 0.5));
 }
 
 .subtitle {

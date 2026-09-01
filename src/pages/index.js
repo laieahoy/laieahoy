@@ -17,9 +17,25 @@ function getThemeBackdrop(theme) {
     };
   }
 
+  if (id.includes('dark-knight-rises')) {
+    return {
+      backgroundImage: 'linear-gradient(135deg, rgba(7,9,14,0.42), rgba(30,36,44,0.1)), url(/img/batmanjueqi2.webp)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    };
+  }
+
+  if (id.includes('dark-knight')) {
+    return {
+      backgroundImage: 'linear-gradient(135deg, rgba(7,9,14,0.42), rgba(30,36,44,0.1)), url(/img/batmanheian.webp)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    };
+  }
+
   if (id.includes('batman')) {
     return {
-      backgroundImage: 'linear-gradient(135deg, rgba(7,9,14,0.42), rgba(30,36,44,0.1)), url(/img/batman-city-bg.webp)',
+      backgroundImage: 'linear-gradient(135deg, rgba(7,9,14,0.42), rgba(30,36,44,0.1)), url(/img/batmanxiaying.webp)',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     };
@@ -103,8 +119,16 @@ function getThemeCardStyle(theme) {
     return { backgroundImage: 'linear-gradient(135deg, rgba(196,58,67,0.08), rgba(17,24,39,0.02)), url(/img/spider-man-web-pattern.webp)' };
   }
 
+  if (id.includes('dark-knight-rises')) {
+    return { backgroundImage: 'linear-gradient(135deg, rgba(12,18,24,0.08), rgba(196,163,80,0.04)), url(/img/batmanjueqi2.webp)' };
+  }
+
+  if (id.includes('dark-knight')) {
+    return { backgroundImage: 'linear-gradient(135deg, rgba(12,18,24,0.08), rgba(196,163,80,0.04)), url(/img/batmanheian.webp)' };
+  }
+
   if (id.includes('batman')) {
-    return { backgroundImage: 'linear-gradient(135deg, rgba(12,18,24,0.08), rgba(196,163,80,0.04)), url(/img/batman-night-sky.webp)' };
+    return { backgroundImage: 'linear-gradient(135deg, rgba(12,18,24,0.08), rgba(196,163,80,0.04)), url(/img/batmanxiaying.webp)' };
   }
 
   if (id.includes('boonie') || id.includes('forest') || id.includes('snow')) {
@@ -189,6 +213,8 @@ function TerminalPanel() {
 function HomepageHeader() {
   const {theme} = useSiteTheme();
   const backdrop = getThemeBackdrop(theme);
+  const themeId = theme?.id || '';
+  const isBatmanTheme = themeId.includes('batman') || themeId.includes('dark-knight');
 
   return (
     <header className={styles.hero}>
@@ -205,7 +231,13 @@ function HomepageHeader() {
               505
               <br />
               <span>Not Found</span>
-              <span className={styles.robot}>🕷️</span>
+              <span className={styles.robot} aria-hidden="true">
+                {isBatmanTheme ? (
+                  <img src="/img/batmansign.webp" alt="" className={styles.batmanBadge} />
+                ) : (
+                  '🕷️'
+                )}
+              </span>
             </Heading>
 
             <p className={styles.subtitle}>
