@@ -39,9 +39,15 @@ function isCorrectPassword(input, expected) {
   return timingSafeEqual(inputBuffer, expectedBuffer);
 }
 
+function stripInvisibleCharacters(value) {
+  return String(value ?? '')
+    .replace(/\u200B|\u200C|\u200D|\uFEFF|\u2060/g, '')
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
+}
+
 function normalizeTags(value) {
   const rawTags = Array.isArray(value) ? value : String(value || '').split(',');
-  return [...new Set(rawTags.map((tag) => String(tag).replace(/[\r\n]/g, ' ').trim()).filter(Boolean))].slice(0, 20);
+  return [...new Set(rawTags.map((tag) => stripInvisibleCharacters(tag).replace(/[\r\n]/g, ' ').trim()).filter(Boolean))].slice(0, 20);
 }
 function isValidBlogPath(filePath) {
   const normalized = String(filePath || '').replace(/\\/g, '/').trim();
@@ -136,18 +142,18 @@ module.exports = async function updateHandler(req, res) {
   }
 
   const body = getBody(req);
-  const filePath = String(body.filePath || '').trim();
-  const title = String(body.title || '').trim();
+  const filePath = stripInvisibleCharacters(String(body.filePath || '')).trim();
+  const title = stripInvisibleCharacters(String(body.title || '')).trim();
   if (filePath && !isValidBlogPath(filePath)) {
   return sendJson(res, 400, {
     message: '文章路径无效，只能更新 blog 目录中的 .md 或 .mdx 文件。',
   });
 }
-  const description = String(body.description || '').trim();
-  const content = String(body.content || '').trim();
+  const description = stripInvisibleCharacters(String(body.description || '')).trim();
+  const content = stripInvisibleCharacters(String(body.content || '')).trim();
   const tags = normalizeTags(body.tags);
-const category = String(body.category || '').trim();
-const date = String(body.date || '').trim();
+const category = stripInvisibleCharacters(String(body.category || '')).trim();
+const date = stripInvisibleCharacters(String(body.date || '')).trim();
 const password = String(body.password || '');
 
   if (!isCorrectPassword(password, process.env.EDITOR_PASSWORD)) {

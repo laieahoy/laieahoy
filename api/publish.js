@@ -40,6 +40,12 @@ function isCorrectPassword(input, expected) {
   return timingSafeEqual(inputBuffer, expectedBuffer);
 }
 
+function stripInvisibleCharacters(value) {
+  return String(value ?? '')
+    .replace(/\u200B|\u200C|\u200D|\uFEFF|\u2060/g, '')
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
+}
+
 function normalizeTags(value) {
   const rawTags = Array.isArray(value)
     ? value
@@ -49,7 +55,7 @@ function normalizeTags(value) {
     ...new Set(
       rawTags
         .map((tag) =>
-          String(tag)
+          stripInvisibleCharacters(tag)
             .replace(/[\r\n]/g, ' ')
             .trim()
         )
@@ -168,11 +174,11 @@ module.exports = async function publishHandler(req, res) {
 
   const body = getBody(req);
 
-const title = String(body.title || '').trim();
-const description = String(body.description || '').trim();
-const content = String(body.content || '').trim();
+const title = stripInvisibleCharacters(String(body.title || '')).trim();
+const description = stripInvisibleCharacters(String(body.description || '')).trim();
+const content = stripInvisibleCharacters(String(body.content || '')).trim();
 const tags = normalizeTags(body.tags);
-const category = String(body.category || '').trim();
+const category = stripInvisibleCharacters(String(body.category || '')).trim();
 const password = String(body.password || '');
 
   if (!isCorrectPassword(password, process.env.EDITOR_PASSWORD)) {
