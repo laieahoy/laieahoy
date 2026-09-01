@@ -233,11 +233,13 @@ html[data-site-theme='spider-man'] {
   --site-primary: #df6544;
   --site-primary-dark: #b6472e;
   --site-primary-soft: rgba(223, 101, 68, 0.18);
+  overscroll-behavior-y: none;
 }
 
 html[data-site-theme='spider-man'] body {
   background-color: #0b1015 !important;
   color: var(--site-text);
+  overscroll-behavior-y: none;
 }
 
 html[data-site-theme='spider-man'] body::before {
