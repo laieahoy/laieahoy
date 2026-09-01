@@ -214,9 +214,27 @@ body::after {
   color: rgba(255, 255, 255, 0.8);
 }
 
+html[data-site-theme='spider-man'] {
+  --site-bg: #0b1015;
+  --site-surface: #101821;
+  --site-surface-strong: #0f1722;
+  --site-text: #edf3fb;
+  --site-text-soft: #c1cedb;
+  --site-border: rgba(255, 255, 255, 0.12);
+  --site-card: rgba(12, 18, 25, 0.82);
+  --site-primary: #df6544;
+  --site-primary-dark: #b6472e;
+  --site-primary-soft: rgba(223, 101, 68, 0.18);
+}
+
+html[data-site-theme='spider-man'] body {
+  background-color: #0b1015 !important;
+  color: var(--site-text);
+}
+
 html[data-site-theme='spider-man'] body::before {
   background-image:
-    linear-gradient(180deg, rgba(11,15,22,0.16), rgba(18,22,30,0.42)),
+    linear-gradient(180deg, rgba(11,15,22,0.26), rgba(18,22,30,0.58)),
     url('/img/spider1.webp'),
     url('/img/spider2.webp'),
     url('/img/spider3.webp'),
@@ -248,6 +266,61 @@ html[data-site-theme='spider-man'] body::before {
     no-repeat,
     repeat;
   background-attachment: fixed, fixed, fixed, fixed, fixed, fixed, scroll;
+}
+
+html[data-site-theme='spider-man'] .main-wrapper,
+html[data-site-theme='spider-man'] .blog-wrapper,
+html[data-site-theme='spider-man'] .docMainWrapper,
+html[data-site-theme='spider-man'] .markdown,
+html[data-site-theme='spider-man'] .blog-list-page .theme-blog-post,
+html[data-site-theme='spider-man'] .blog-list-page .container,
+html[data-site-theme='spider-man'] .main-wrapper > .container {
+  background: rgba(10, 14, 19, 0.38) !important;
+  color: var(--site-text) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-site-theme='spider-man'] .navbar,
+html[data-site-theme='spider-man'] .navbar__inner,
+html[data-site-theme='spider-man'] .theme-story-ribbon {
+  background: rgba(8, 12, 18, 0.82) !important;
+  color: var(--site-text) !important;
+  border-color: rgba(255, 255, 255, 0.11);
+}
+
+html[data-site-theme='spider-man'] .navbar__title,
+html[data-site-theme='spider-man'] .navbar__link,
+html[data-site-theme='spider-man'] .navbar__brand,
+html[data-site-theme='spider-man'] .navbar__items--right button,
+html[data-site-theme='spider-man'] .footer,
+html[data-site-theme='spider-man'] .footer__link-item,
+html[data-site-theme='spider-man'] .footer__title,
+html[data-site-theme='spider-man'] .markdown,
+html[data-site-theme='spider-man'] .markdown * {
+  color: var(--site-text) !important;
+}
+
+html[data-site-theme='spider-man'] .markdown > * {
+  color: rgba(237, 243, 251, 0.96) !important;
+}
+
+html[data-site-theme='spider-man'] .theme-story-ribbon__tag,
+html[data-site-theme='spider-man'] .theme-story-ribbon strong,
+html[data-site-theme='spider-man'] .theme-story-ribbon__action,
+html[data-site-theme='spider-man'] .theme-story-ribbon__action:hover {
+  color: #ffffff !important;
+}
+
+html[data-site-theme='spider-man'] .theme-story-ribbon__action {
+  border-color: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.05);
+}
+
+html[data-site-theme='spider-man'] .blog-list-page .theme-blog-post h2 a,
+html[data-site-theme='spider-man'] .blog-list-page .theme-blog-post__title a,
+html[data-site-theme='spider-man'] a,
+html[data-site-theme='spider-man'] a:hover {
+  color: #f7b18f !important;
 }
 
 html[data-site-theme='batman-begins'] body::before,
