@@ -1117,7 +1117,7 @@ html[data-site-theme='dark-knight-rises'] .theme-story-ribbon {
 html[data-site-theme='spider-man'] .page-top-spider {
   display: block;
   position: sticky !important;
-  top: 24px !important;
+  top: calc(var(--ifm-navbar-height) + 116px) !important;
   left: 50% !important;
   width: 248px;
   height: 228px;
