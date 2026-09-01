@@ -37,6 +37,7 @@ export default function ThemeProvider({children}) {
     }
 
     const root = document.documentElement;
+    const body = document.body;
     const forceDark =
       (selectedTheme.id && selectedTheme.id.includes('spider')) ||
       selectedTheme.character === 'bat-signal';
@@ -45,14 +46,21 @@ export default function ThemeProvider({children}) {
       selectedTheme.id?.includes('minimal-dark') ||
       selectedTheme.id?.includes('dark') ||
       selectedTheme.nightMode === '暗色版';
+    const nextTheme = themeIsDark ? 'dark' : 'light';
 
-    root.setAttribute('data-theme', themeIsDark ? 'dark' : 'light');
+    root.setAttribute('data-theme', nextTheme);
     root.dataset.siteTheme = selectedTheme.id;
-
+    root.style.colorScheme = nextTheme;
     root.style.setProperty('--theme-accent', selectedTheme.accent);
     root.style.setProperty('--theme-accent-strong', selectedTheme.accentStrong);
     root.style.setProperty('--theme-surface', selectedTheme.surface);
     root.style.setProperty('--theme-surface-dark', selectedTheme.surfaceDark);
+
+    if (body) {
+      body.setAttribute('data-site-theme', selectedTheme.id);
+      body.setAttribute('data-theme', nextTheme);
+      body.style.colorScheme = nextTheme;
+    }
 
     window.localStorage.setItem(STORAGE_KEY, selectedTheme.id);
 
@@ -62,9 +70,15 @@ export default function ThemeProvider({children}) {
         if (document.documentElement.getAttribute('data-theme') !== 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
         }
+        if (body && body.getAttribute('data-theme') !== 'dark') {
+          body.setAttribute('data-theme', 'dark');
+        }
       });
 
       observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+      if (body) {
+        observer.observe(body, { attributes: true, attributeFilter: ['data-theme'] });
+      }
     }
 
     return () => {
