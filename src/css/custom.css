@@ -1011,17 +1011,17 @@ html[data-site-theme='dark-knight-rises'] .theme-story-ribbon {
   display: none;
 }
 
-/* 显示在蜘蛛主题：固定在视口，保证可见 */
+/* 仅蜘蛛侠主题保持顶部蜘蛛侠固定，不随页面滚动移动 */
 html[data-site-theme^='spider'] .page-top-spider,
 html[data-theme='dark'][data-site-theme^='spider'] .page-top-spider,
 html[data-site-theme='spider-man'] .page-top-spider {
   display: block;
-  position: fixed;
+  position: fixed !important;
   top: calc(var(--ifm-navbar-height, 64px) + 6px);
   left: 50%;
   width: 248px;
   height: 228px;
-  transform: translateX(-50%) scale(0.98);
+  transform: translateX(-50%) scale(0.98) !important;
   z-index: 220;
   opacity: 1;
   pointer-events: auto;

@@ -99,6 +99,8 @@ function buildMarkdown({
     ...tags.map((tag) => `  - ${yamlString(tag)}`),
     '---',
     '',
+    '<!-- truncate -->',
+    '',
     content.trim(),
     '',
   ].join('\n');

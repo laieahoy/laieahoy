@@ -30,7 +30,7 @@ function TopSpiderWeb({launchKey, launchTarget}) {
   const [showQuote, setShowQuote] = useState(false);
 
   const launchStyle = React.useMemo(() => {
-    if (!launchTarget) {
+    if (!launchTarget || typeof window === 'undefined') {
       return {
         '--launch-angle': '10deg',
         '--launch-length': '96px',

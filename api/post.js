@@ -120,7 +120,7 @@ if (!isValidBlogPath(normalizedFilePath)) {
 
   if (!hasGitHubConfig) {
     try {
-readLocalPost(normalizedFilePath)
+      const post = readLocalPost(normalizedFilePath);
       return sendJson(res, 200, { post });
     } catch (error) {
       return sendJson(res, 404, { message: `读取文章失败：${error.message}` });

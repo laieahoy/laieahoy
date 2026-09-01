@@ -41,6 +41,14 @@ function isCorrectPassword(input, expected) {
   return timingSafeEqual(inputBuffer, expectedBuffer);
 }
 
+function isValidBlogPath(filePath) {
+  return (
+    /^blog\/[A-Za-z0-9._\-/]+\.(md|mdx)$/i.test(filePath) &&
+    !filePath.split('/').includes('..') &&
+    !filePath.includes('//')
+  );
+}
+
 function encodeGithubPath(filePath) {
   return filePath
     .split('/')

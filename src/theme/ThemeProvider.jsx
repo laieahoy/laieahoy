@@ -27,7 +27,11 @@ export default function ThemeProvider({children}) {
   }, []);
 
   useEffect(() => {
-    const selectedTheme = getTheme(themeId);
+    const selectedTheme = getTheme(themeId) || getTheme(defaultThemeId);
+    if (!selectedTheme) {
+      return;
+    }
+
     const root = document.documentElement;
     // If the selected theme is a Spider variant or a Batman-style theme, force dark color mode
     const forceDark =

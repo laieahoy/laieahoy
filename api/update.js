@@ -70,6 +70,8 @@ function buildMarkdown({ title, description, tags, category, content, date }) {
     ...tags.map((tag) => `  - ${yamlString(tag)}`),
     '---',
     '',
+    '<!-- truncate -->',
+    '',
     content.trim(),
     '',
   ].join('\n');

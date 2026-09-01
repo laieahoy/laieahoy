@@ -63,9 +63,18 @@ export default function WritePage() {
   const [publishing, setPublishing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [doublePane, setDoublePane] = useState(true);
-const [selectedFilePath, setSelectedFilePath] = useState('');
-const [originalDate, setOriginalDate] = useState('');
-const [posts, setPosts] = useState([]);
+  const [selectedFilePath, setSelectedFilePath] = useState('');
+  const [originalDate, setOriginalDate] = useState('');
+  const [originalArticle, setOriginalArticle] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const initialFilePath = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    return params.get('filePath') || '';
+  }, []);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [postsError, setPostsError] = useState('');
   const [status, setStatus] = useState({ type: '', text: '', commitUrl: '' });
@@ -75,22 +84,21 @@ const [posts, setPosts] = useState([]);
   const selectedPost = posts.find((post) => post.filePath === selectedFilePath) || null;
 
   async function loadArticleByPath(filePath) {
- if (!filePath) {
-  setOriginalDate('');
-
-  setForm((current) => ({
-    ...current,
-    title: '',
-    description: '',
-    tags: '',
-    category: 'algorithm/solutions/competition',
-    content: '',
-    password: '',
-  }));
-
-  setSelectedFilePath('');
-  return;
-}
+    if (!filePath) {
+      setOriginalDate('');
+      setOriginalArticle(null);
+      setForm((current) => ({
+        ...current,
+        title: '',
+        description: '',
+        tags: '',
+        category: 'algorithm/solutions/competition',
+        content: '',
+        password: '',
+      }));
+      setSelectedFilePath('');
+      return;
+    }
 
     setSelectedFilePath(filePath);
     setDeleteStatus({ type: '', text: '', commitUrl: '' });
@@ -104,16 +112,24 @@ const [posts, setPosts] = useState([]);
       }
 
       const article = data.post || {};
-      setOriginalDate(article.date || '');
-      setForm((current) => ({
-        ...current,
+      const nextForm = {
         title: article.title || '',
         description: article.description || '',
         tags: Array.isArray(article.tags) ? article.tags.join(', ') : '',
-        category: article.category || current.category || 'algorithm/solutions/competition',
+        category: article.category || 'algorithm/solutions/competition',
         content: article.content || '',
         password: '',
-      }));
+      };
+      const normalizedArticle = {
+        ...article,
+        filePath: filePath,
+        date: article.date || '',
+        tags: Array.isArray(article.tags) ? [...article.tags] : [],
+      };
+
+      setOriginalDate(normalizedArticle.date || '');
+      setOriginalArticle(normalizedArticle);
+      setForm((current) => ({ ...current, ...nextForm }));
       setStatus({
         type: 'success',
         text: `已加载文章：${article.title || filePath}`,
@@ -151,6 +167,12 @@ const [posts, setPosts] = useState([]);
   useEffect(() => {
     loadPosts();
   }, []);
+
+  useEffect(() => {
+    if (initialFilePath) {
+      loadArticleByPath(initialFilePath);
+    }
+  }, [initialFilePath]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -226,7 +248,19 @@ password: form.password,
       }
 
       const savedPath = data.filePath || selectedFilePath;
+      const savedDate = originalDate || new Date().toISOString();
+
       setSelectedFilePath(savedPath);
+      setOriginalDate(savedDate);
+      setOriginalArticle({
+        filePath: savedPath,
+        title: title,
+        description: description,
+        category: category,
+        tags: tags,
+        content: content,
+        date: savedDate,
+      });
       setStatus({
         type: 'success',
         text: selectedFilePath ? `文章更新成功：${savedPath}` : `文章已发布：${savedPath}`,
@@ -284,13 +318,12 @@ password: form.password,
       });
 
       setSelectedFilePath('');
-setOriginalDate('');
-setSelectedFilePath('');
-
-setForm((current) => ({
-  ...initialForm,
-  password: '',
-}));
+      setOriginalDate('');
+      setOriginalArticle(null);
+      setForm((current) => ({
+        ...initialForm,
+        password: '',
+      }));
       await loadPosts();
     } catch (error) {
       setDeleteStatus({ type: 'error', text: error.message || '删除失败，请稍后重试。', commitUrl: '' });
