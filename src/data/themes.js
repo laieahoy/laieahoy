@@ -495,7 +495,7 @@ export const themes = [
   }),
 ];
 
-export const defaultThemeId = 'spider-man';
+export const defaultThemeId = 'minimal-light';
 
 export function getTheme(themeId) {
   return (
