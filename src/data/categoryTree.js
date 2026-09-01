@@ -161,7 +161,24 @@ function attachArticleMetadata(list, parentPath = []) {
   return list;
 }
 
+function normalizeCategoryCounts(list) {
+  list.forEach((category) => {
+    if (category.children?.length) {
+      normalizeCategoryCounts(category.children);
+    }
+
+    const directArticles = category.articles || [];
+    const childTotal = (category.children || []).reduce(
+      (sum, child) => sum + (child.count || 0),
+      0
+    );
+
+    category.count = directArticles.length + childTotal;
+  });
+}
+
 attachArticleMetadata(topCategories);
+normalizeCategoryCounts(topCategories);
 
 export const categoryLookup = new Map();
 

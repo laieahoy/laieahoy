@@ -260,7 +260,7 @@ function getThemeSceneGroup(themeId) {
   return 'default';
 }
 
-function ThemeHoverCard({ to, className, children, ...props }) {
+function ThemeHoverCard({ to, className, children, style, ...props }) {
   const {themeId} = useSiteTheme();
   const [pointer, setPointer] = useState({ x: 50, y: 18, angle: 12, length: 120 });
   const [isShooting, setIsShooting] = useState(false);
@@ -305,6 +305,7 @@ function ThemeHoverCard({ to, className, children, ...props }) {
       onMouseLeave={() => sceneGroup === 'spider-man' && setIsTargeting(false)}
       onClick={handleClick}
       style={{
+        ...style,
         '--pointer-x': `${pointer.x}px`,
         '--pointer-y': `${pointer.y}px`,
         '--web-angle': `${pointer.angle}deg`,
@@ -357,6 +358,7 @@ function HomepageContent() {
                 className={styles.infoCard}
                 to={section.link}
                 key={section.number}
+                style={section.number === '02' ? { backgroundImage: 'none' } : undefined}
               >
                 <span className={styles.cardNumber}>{section.number}</span>
                 <h3>{section.title}</h3>
