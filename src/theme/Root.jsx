@@ -141,7 +141,7 @@ function RootShell({children}) {
 
       window.setTimeout(() => {
         window.location.assign(destination);
-      }, 280);
+      }, 120);
     };
 
     document.addEventListener('click', handleLinkClick, true);

@@ -2,6 +2,7 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
 } from 'react';
@@ -15,25 +16,27 @@ import {
 const STORAGE_KEY = '505-site-theme';
 const ThemeContext = createContext(null);
 
+function readStoredThemeId() {
+  if (typeof window === 'undefined') {
+    return defaultThemeId;
+  }
+
+  const savedThemeId = window.localStorage.getItem(STORAGE_KEY);
+  return savedThemeId && themes.some((theme) => theme.id === savedThemeId)
+    ? savedThemeId
+    : defaultThemeId;
+}
+
 export default function ThemeProvider({children}) {
-  const [themeId, setThemeId] = useState(defaultThemeId);
+  const [themeId, setThemeId] = useState(() => readStoredThemeId());
 
-  useEffect(() => {
-    const savedThemeId = window.localStorage.getItem(STORAGE_KEY);
-
-    if (savedThemeId && themes.some((theme) => theme.id === savedThemeId)) {
-      setThemeId(savedThemeId);
-    }
-  }, []);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     const selectedTheme = getTheme(themeId) || getTheme(defaultThemeId);
     if (!selectedTheme) {
       return;
     }
 
     const root = document.documentElement;
-    // If the selected theme is a Spider variant or a Batman-style theme, force dark color mode
     const forceDark =
       (selectedTheme.id && selectedTheme.id.includes('spider')) ||
       selectedTheme.character === 'bat-signal';
@@ -51,8 +54,6 @@ export default function ThemeProvider({children}) {
 
     window.localStorage.setItem(STORAGE_KEY, selectedTheme.id);
 
-    // If this theme requires dark-only, observe any attempts to change `data-theme`
-    // (for example by other UI components or on navigation) and revert back to dark.
     let observer;
     if (forceDark) {
       observer = new MutationObserver(() => {
