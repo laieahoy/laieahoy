@@ -1,0 +1,38 @@
+name: Publish new blog post
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'blog/**'
+
+jobs:
+  generate-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate categories
+        run: npm run generate:categories
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit generated categories
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/categoryArticles.generated.json
+          git commit -m "chore: update generated category articles" || echo "no changes"
+          git push || echo "push failed"

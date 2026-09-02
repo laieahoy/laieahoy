@@ -1,17 +1,17 @@
-export const categoryArticles = [
-  {
-    title: 'COCI 2023/2024 5题解',
-    description: 'COCI 2023/2024 部分题目解析。',
-    categoryPath: 'algorithm/solutions/competition',
-    url: '/blog/2026/08/25/算法/题解/',
-  },
-  {
-    title: 'COCI 2016/2017 部分题目题解',
-    description: 'COCI 2016/2017 部分题目解析。',
-    categoryPath: 'algorithm/solutions/competition',
-    url: '/blog/2026/08/26/算法/题解/',
-  },
-];
+let generatedCategoryArticles = [];
+
+try {
+  // prefer generated JSON produced by scripts/generateCategories.js
+  // during development/build this file will be regenerated automatically
+  // and committed by CI or locally via `npm run generate:categories`.
+  // eslint-disable-next-line global-require, import/no-dynamic-require
+  generatedCategoryArticles = require('@site/src/data/categoryArticles.generated.json');
+} catch (e) {
+  // fallback to empty list when not present
+  generatedCategoryArticles = [];
+}
+
+export const categoryArticles = generatedCategoryArticles;
 
 export const topCategories = [
   {
