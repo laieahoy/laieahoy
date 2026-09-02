@@ -79,11 +79,6 @@ export default function ThemeSwitcher() {
                       <span className={styles.swatch} />
                       <span>
                         {theme.name}
-                        {theme.lightMode && theme.nightMode ? (
-                          <small className={styles.modeBadge}>
-                            {theme.lightMode}/{theme.nightMode}
-                          </small>
-                        ) : null}
                       </span>
                     </button>
                   ))}

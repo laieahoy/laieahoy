@@ -83,6 +83,13 @@
   stroke-linecap: round;
   opacity: 0.95;
 }
+.simpleToggle {
+  background: transparent;
+  border: 0;
+  color: var(--site-text);
+  font-size: 1.05rem;
+  cursor: pointer;
+}
 
 .shadeDetail {
   fill: none;

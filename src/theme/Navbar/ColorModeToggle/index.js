@@ -10,15 +10,8 @@ export default function NavbarColorModeToggle({className}) {
   if (disableSwitch) {
     return null;
   }
-  const siteTheme = useSiteTheme().theme;
-  const forceDark = siteTheme && (siteTheme.id?.includes('spider') || siteTheme.character === 'bat-signal');
-  if (forceDark) {
-    return (
-      <div className={className} title="该主题仅支持暗色模式">
-        <button className={styles.disabledDark} disabled aria-disabled="true">🌙 暗色</button>
-      </div>
-    );
-  }
+  // Simplify: always render the default `ColorModeToggle` without forcing dark-only UI.
+  // User requested removal of theme-specific light/dark lamp UI behaviors.
   return (
     <ColorModeToggle
       className={className}

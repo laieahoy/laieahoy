@@ -421,7 +421,7 @@ function HomepageContent() {
                 className={styles.themeCard}
                 style={getThemeCardStyle(theme)}
               >
-                <span className={styles.themeTone}>{theme.lightMode || '亮色'} / {theme.nightMode || '暗色'}</span>
+                {/* remove per-theme light/dark display badge */}
                 <h3>{theme.name}</h3>
                 <p>{theme.description}</p>
               </div>

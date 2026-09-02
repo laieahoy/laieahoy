@@ -221,8 +221,6 @@ export const themes = [
     description: '蜘蛛侠主题基于《蜘蛛侠》系列电影改编，讲述少年彼得·帕克在责任与成长之间挣扎，学生时代的青春、城市街区与蛛网传奇交织成一段充满热血与幽默的英雄故事。',
     character: 'spider',
     palette: 'spider',
-    nightMode: '暗色版',
-    lightMode: '亮色版',
   }),
 
   makeTheme({
@@ -232,8 +230,6 @@ export const themes = [
     description: '这是关于成长、恐惧与信念的起点，布鲁斯·韦恩在黑暗中学会如何成为守夜人，哥谭的风、雾和神秘信号被浓缩成一个英雄的誕生故事。',
     character: 'bat-signal',
     palette: 'gold',
-    nightMode: '暗色版',
-    lightMode: '亮色版',
   }),
 
   makeTheme({
@@ -243,8 +239,6 @@ export const themes = [
     description: '黑暗骑士的版本更偏沉重与残酷，秩序与混乱之间的碰撞，让城市在光与影之间不断被推向极限。',
     character: 'bat-signal',
     palette: 'red',
-    nightMode: '暗色版',
-    lightMode: '亮色版',
   }),
 
   makeTheme({
@@ -254,8 +248,6 @@ export const themes = [
     description: '城市在废墟中重建，信念、牺牲和希望成为最核心的情绪，像一座在黑暗中重新升起的希望之塔。',
     character: 'bat-signal',
     palette: 'orange',
-    nightMode: '暗色版',
-    lightMode: '亮色版',
   }),
 
   makeTheme({

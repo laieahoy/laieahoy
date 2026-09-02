@@ -40,7 +40,9 @@ export default function ThemeProvider({children}) {
     const body = document.body;
     const forceDark =
       (selectedTheme.id && selectedTheme.id.includes('spider')) ||
-      selectedTheme.character === 'bat-signal';
+      selectedTheme.character === 'bat-signal' ||
+      selectedTheme.id?.includes('minimal-dark');
+    const forceLight = selectedTheme.id?.includes('minimal-light');
     const themeIsDark =
       forceDark ||
       selectedTheme.id?.includes('minimal-dark') ||
@@ -65,13 +67,14 @@ export default function ThemeProvider({children}) {
     window.localStorage.setItem(STORAGE_KEY, selectedTheme.id);
 
     let observer;
-    if (forceDark || themeIsDark) {
+    if (forceDark || forceLight || themeIsDark) {
+      const desired = forceDark || themeIsDark ? 'dark' : 'light';
       observer = new MutationObserver(() => {
-        if (document.documentElement.getAttribute('data-theme') !== 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
+        if (document.documentElement.getAttribute('data-theme') !== desired) {
+          document.documentElement.setAttribute('data-theme', desired);
         }
-        if (body && body.getAttribute('data-theme') !== 'dark') {
-          body.setAttribute('data-theme', 'dark');
+        if (body && body.getAttribute('data-theme') !== desired) {
+          body.setAttribute('data-theme', desired);
         }
       });
 
