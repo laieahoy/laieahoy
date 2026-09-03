@@ -65,28 +65,6 @@ export default function ThemeProvider({children}) {
     }
 
     window.localStorage.setItem(STORAGE_KEY, selectedTheme.id);
-
-    let observer;
-    if (forceDark || forceLight || themeIsDark) {
-      const desired = forceDark || themeIsDark ? 'dark' : 'light';
-      observer = new MutationObserver(() => {
-        if (document.documentElement.getAttribute('data-theme') !== desired) {
-          document.documentElement.setAttribute('data-theme', desired);
-        }
-        if (body && body.getAttribute('data-theme') !== desired) {
-          body.setAttribute('data-theme', desired);
-        }
-      });
-
-      observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
-      if (body) {
-        observer.observe(body, { attributes: true, attributeFilter: ['data-theme'] });
-      }
-    }
-
-    return () => {
-      if (observer) observer.disconnect();
-    };
   }, [themeId]);
 
   useEffect(() => {

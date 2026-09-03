@@ -156,22 +156,14 @@ const [isDark, setIsDark] = useState(() => {
     return () => window.clearInterval(timer);
   }, []);
   useEffect(() => {
-  const root = document.documentElement;
+    const root = document.documentElement;
 
-  function updateColorMode() {
-    setIsDark(root.getAttribute('data-theme') === 'dark');
-  }
+    function updateColorMode() {
+      setIsDark(root.getAttribute('data-theme') === 'dark');
+    }
 
-  updateColorMode();
-
-  const observer = new MutationObserver(updateColorMode);
-  observer.observe(root, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-  });
-
-  return () => observer.disconnect();
-}, []);
+    updateColorMode();
+  }, []);
 
   useEffect(() => {
     wakeSpider();
@@ -298,11 +290,8 @@ const [isDark, setIsDark] = useState(() => {
     };
 
     bindLinks();
-    const observer = new MutationObserver(bindLinks);
-    observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
-      observer.disconnect();
       unbindLinks();
       timers.current.forEach((timer) => window.clearTimeout(timer));
       timers.current = [];
