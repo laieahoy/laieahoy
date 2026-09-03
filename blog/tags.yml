@@ -28,6 +28,11 @@ hola:
   permalink: /题解
   description: 各类算法题目和竞赛题解。
 
+比赛:
+  label: 比赛
+  permalink: /比赛
+  description: 各类竞赛题解与赛后复盘。
+
 coci:
   label: coci
   permalink: /coci

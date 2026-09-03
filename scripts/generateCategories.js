@@ -18,6 +18,31 @@ function walkDir(dir) {
   return files;
 }
 
+function getDocusaurusBlogUrl(filePath, blogDir) {
+  const relativePath = path.relative(blogDir, filePath).split(path.sep).join('/');
+  const withoutExtension = relativePath.replace(/\.mdx?$/i, '');
+  const segments = withoutExtension.split('/');
+  const fileName = segments.pop();
+  const dateMatch = fileName.match(/^(\d{4})-(\d{2})-(\d{2})(?:[-_](.+))?$/);
+
+  if (!dateMatch) {
+    return `/blog/${withoutExtension.replace(/^\//, '')}/`;
+  }
+
+  const [, year, month, day, remainder] = dateMatch;
+  const routeParts = [year, month, day];
+
+  if (remainder) {
+    routeParts.push(remainder);
+  }
+
+  if (segments.length > 0) {
+    routeParts.push(...segments);
+  }
+
+  return `/blog/${routeParts.join('/')}/`;
+}
+
 function build() {
   const blogDir = path.join(__dirname, '..', 'blog');
   const outDir = path.join(__dirname, '..', 'src', 'data');
@@ -33,13 +58,7 @@ function build() {
     if (!data || !data.title) continue;
 
     const date = data.date ? String(data.date).slice(0,10) : '1970-01-01';
-    const slug = f
-      .replace(/^.*blog\//, '')
-      .replace(/\\\\/g, '/')
-      .replace(/\.mdx?$/, '')
-      .replace(/^\//, '');
-
-    const url = `/blog/${slug}/`;
+    const url = getDocusaurusBlogUrl(f, blogDir);
 
     articles.push({
       title: data.title,

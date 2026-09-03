@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import Layout from '@theme/Layout';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -6,6 +6,24 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import styles from '@site/src/pages/write.module.css';
 import {getCategoryOptions} from '@site/src/data/categoryTree';
+
+const latexSnippets = [
+  {label: '分式', value: '\\frac{a}{b}'},
+  {label: '积分', value: '\\int_a^b f(x) \\, dx'},
+  {label: '求和', value: '\\sum_{i=1}^{n} i^2'},
+  {label: '极限', value: '\\lim_{n \\to \\infty} \\frac{1}{n}'},
+  {label: '根号', value: '\\sqrt{x^2 + y^2}'},
+  {label: '矩阵', value: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}'},
+  {
+    label: '公式块',
+    value: String.raw`\[
+\begin{aligned}
+(a+b)^2 &= a^2 + 2ab + b^2\\
+(a-b)^2 &= a^2 - 2ab + b^2
+\end{aligned}
+\]`,
+  },
+];
 
 const initialForm = {
   title: '',
@@ -79,9 +97,30 @@ export default function WritePage() {
   const [postsError, setPostsError] = useState('');
   const [status, setStatus] = useState({ type: '', text: '', commitUrl: '' });
   const [deleteStatus, setDeleteStatus] = useState({ type: '', text: '', commitUrl: '' });
+  const textareaRef = useRef(null);
 
   const categoryOptions = useMemo(() => getCategoryOptions(), []);
   const selectedPost = posts.find((post) => post.filePath === selectedFilePath) || null;
+
+  function insertLatexSnippet(snippet) {
+    const textarea = textareaRef.current;
+    const start = textarea ? textarea.selectionStart : form.content.length;
+    const end = textarea ? textarea.selectionEnd : form.content.length;
+    const nextContent = `${form.content.slice(0, start)}${snippet}${form.content.slice(end)}`;
+
+    setForm((current) => ({ ...current, content: nextContent }));
+
+    requestAnimationFrame(() => {
+      if (!textarea) {
+        return;
+      }
+
+      textarea.focus();
+      const nextCursor = start + snippet.length;
+      textarea.selectionStart = nextCursor;
+      textarea.selectionEnd = nextCursor;
+    });
+  }
 
   async function loadArticleByPath(filePath) {
     if (!filePath) {
@@ -411,7 +450,41 @@ password: form.password,
 
             <div className={styles.field}>
               <label htmlFor="content">Markdown 正文</label>
-              <textarea id="content" name="content" className={styles.contentInput} value={form.content} onChange={handleChange} placeholder={'# 文章标题\n\n开始写文章……'} />
+              <div className={styles.latexToolbar}>
+                <div className={styles.latexHeaderRow}>
+                  <span className={styles.latexTitle}>数学速查</span>
+                  <a
+                    className={styles.latexLink}
+                    href="https://katex.org/docs/support_table"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    LATEX 公式写法大全
+                  </a>
+                </div>
+                <div className={styles.latexChips}>
+                  {latexSnippets.map((snippet) => (
+                    <button
+                      key={snippet.label}
+                      type="button"
+                      className={styles.latexChip}
+                      onClick={() => insertLatexSnippet(snippet.value)}
+                      title={snippet.label}
+                    >
+                      {snippet.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <textarea
+                ref={textareaRef}
+                id="content"
+                name="content"
+                className={styles.contentInput}
+                value={form.content}
+                onChange={handleChange}
+                placeholder={'# 文章标题\n\n开始写文章……'}
+              />
             </div>
 
             <div className={styles.field}>
