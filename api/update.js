@@ -79,12 +79,13 @@ function yamlString(value) {
   return JSON.stringify(String(value || ''));
 }
 
-function buildMarkdown({ title, description, tags, category, content, date }) {
+function buildMarkdown({ title, description, tags, category, content, date, author = 'laieahoy' }) {
   return [
     '---',
     `title: ${yamlString(title)}`,
     `description: ${yamlString(description)}`,
     `date: ${date}`,
+    `authors: [${author}]`,
     `category: ${yamlString(category)}`,
     'tags:',
     ...tags.map((tag) => `  - ${yamlString(tag)}`),
@@ -200,6 +201,7 @@ const targetPath =
     category,
     content,
     date: date || new Date().toISOString(),
+    author: 'laieahoy',
   });
 
   try {

@@ -94,12 +94,14 @@ function buildMarkdown({
   category,
   content,
   date,
+  author = 'laieahoy',
 }) {
   return [
     '---',
     `title: ${yamlString(title)}`,
     `description: ${yamlString(description)}`,
     `date: ${date}`,
+    `authors: [${author}]`,
     `category: ${yamlString(category)}`,
     'tags:',
     ...tags.map((tag) => `  - ${yamlString(tag)}`),
@@ -239,6 +241,7 @@ const markdown = buildMarkdown({
   category,
   content,
   date: now.toISOString(),
+  author: 'laieahoy',
 });
 
   const githubPath = encodeGithubPath(filePath);
