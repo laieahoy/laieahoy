@@ -182,6 +182,7 @@
         <category label="算法" term="算法"/>
         <category label="题解" term="题解"/>
         <category label="比赛" term="比赛"/>
+        <category label="COCI" term="COCI"/>
     </entry>
     <entry>
         <title type="html"><![CDATA[点分治学习笔记]]></title>
