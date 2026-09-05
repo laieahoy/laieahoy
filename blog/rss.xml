@@ -392,6 +392,7 @@ dp[u][i+j+1][1]=dp[u][i][0]+dp[v][j][1]\\</annotation></semantics></math></span>
             <category>算法</category>
             <category>题解</category>
             <category>比赛</category>
+            <category>COCI</category>
         </item>
         <item>
             <title><![CDATA[COCI2017/2018 部分题目题解2]]></title>
