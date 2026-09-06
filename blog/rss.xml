@@ -388,7 +388,7 @@ f_u=m1+max(1,num)</annotation></semantics></math></span><span class="katex-html"
             <link>https://laieahoy.example.com/blog/2026/09/04/洛谷-p2664-树上游戏-题解</link>
             <guid>https://laieahoy.example.com/blog/2026/09/04/洛谷-p2664-树上游戏-题解</guid>
             <pubDate>Fri, 04 Sep 2026 12:29:09 GMT</pubDate>
-            <content:encoded><![CDATA[<p>这道题有两种比较好的做法。除了本文介绍的做法以外，还有一种点分治的做法，在<a href="https://laieahoy.nsoj.top/blog/2026/09/03/%E7%82%B9%E5%88%86%E6%B2%BB%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0" target="_blank" rel="noopener noreferrer" class="">这里</a>。</p>
+            <content:encoded><![CDATA[<p>这道题有两种比较好的做法。除了本文介绍的做法以外，还有一种点分治的做法，在<a href="https://laieahoy.nsoj.top/blog/2026/09/03/%E7%82%B9%E5%88%86%E6%B2%BB%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0" target="_blank" rel="noopener noreferrer" class="">这里</a>（<del>不过现在还没写</del>）。</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="分析">分析<a href="https://laieahoy.example.com/blog/2026/09/04/%E6%B4%9B%E8%B0%B7-p2664-%E6%A0%91%E4%B8%8A%E6%B8%B8%E6%88%8F-%E9%A2%98%E8%A7%A3#%E5%88%86%E6%9E%90" class="hash-link" aria-label="分析的直接链接" title="分析的直接链接" translate="no">​</a></h2>
 <p>题目给出一棵有 <code>n</code> 个节点的树，每个节点都有一种颜色。</p>
 <p>记节点 <code>i</code> 到节点 <code>j</code> 的路径上出现的不同颜色数量为：</p>
