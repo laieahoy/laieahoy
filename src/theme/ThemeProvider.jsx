@@ -1,90 +1,35 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, {createContext, useContext, useLayoutEffect, useMemo, useState} from 'react';
 import OriginalThemeProvider from '@theme-original/ThemeProvider';
-import {
-  defaultThemeId,
-  getTheme,
-  themes,
-} from '@site/src/data/themes';
 
-const STORAGE_KEY = '505-site-theme';
 const ThemeContext = createContext(null);
-
-function readStoredThemeId() {
-  if (typeof window === 'undefined') {
-    return defaultThemeId;
-  }
-
-  const savedThemeId = window.localStorage.getItem(STORAGE_KEY);
-  return savedThemeId && themes.some((theme) => theme.id === savedThemeId)
-    ? savedThemeId
-    : defaultThemeId;
-}
+const DEFAULT_THEME_ID = 'minimal-light';
 
 export default function ThemeProvider({children}) {
-  const [themeId, setThemeId] = useState(() => readStoredThemeId());
+  const [themeId, setThemeId] = useState(DEFAULT_THEME_ID);
 
   useLayoutEffect(() => {
-    const selectedTheme = getTheme(themeId) || getTheme(defaultThemeId);
-    if (!selectedTheme) {
-      return;
-    }
-
     const root = document.documentElement;
     const body = document.body;
-    const forceDark =
-      (selectedTheme.id && selectedTheme.id.includes('spider')) ||
-      selectedTheme.character === 'bat-signal' ||
-      selectedTheme.id?.includes('minimal-dark');
-    const forceLight = selectedTheme.id?.includes('minimal-light');
-    const themeIsDark =
-      forceDark ||
-      selectedTheme.id?.includes('minimal-dark') ||
-      selectedTheme.id?.includes('dark') ||
-      selectedTheme.nightMode === '暗色版';
-    const nextTheme = themeIsDark ? 'dark' : 'light';
 
-    root.setAttribute('data-theme', nextTheme);
-    root.dataset.siteTheme = selectedTheme.id;
-    root.style.colorScheme = nextTheme;
-    root.style.setProperty('--theme-accent', selectedTheme.accent);
-    root.style.setProperty('--theme-accent-strong', selectedTheme.accentStrong);
-    root.style.setProperty('--theme-surface', selectedTheme.surface);
-    root.style.setProperty('--theme-surface-dark', selectedTheme.surfaceDark);
+    root.setAttribute('data-theme', 'light');
+    root.dataset.siteTheme = 'minimal-light';
+    root.style.colorScheme = 'light';
+    root.style.setProperty('--theme-accent', '#111111');
+    root.style.setProperty('--theme-accent-strong', '#2d2d2d');
+    root.style.setProperty('--theme-surface', '#f5f3ef');
+    root.style.setProperty('--theme-surface-dark', '#121212');
 
     if (body) {
-      body.setAttribute('data-site-theme', selectedTheme.id);
-      body.setAttribute('data-theme', nextTheme);
-      body.style.colorScheme = nextTheme;
+      body.setAttribute('data-theme', 'light');
+      body.dataset.siteTheme = 'minimal-light';
+      body.style.colorScheme = 'light';
     }
-
-    window.localStorage.setItem(STORAGE_KEY, selectedTheme.id);
   }, [themeId]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY * 0.12;
-      document.documentElement.style.setProperty('--scroll-shift', `${offset}px`);
-    };
-
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, {passive: true});
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
 
   const value = useMemo(
     () => ({
       themeId,
-      theme: getTheme(themeId),
+      theme: {id: themeId, name: '简洁版', description: '纯净阅读模式'},
       setThemeId,
     }),
     [themeId]

@@ -10,7 +10,7 @@ const config = {
   // 网站基本信息
   title: '505 Not Found',
   tagline: '这里没有找到答案，但找到了一个博客。',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
 
   // 网站语言设置
   i18n: {
@@ -55,6 +55,8 @@ const config = {
 
 blog: {
   showReadingTime: true,
+  showLastUpdateTime: false,
+  sortPosts: 'descending',
   remarkPlugins: [remarkMath],
   rehypePlugins: [rehypeKatex],
 },
@@ -87,8 +89,8 @@ blog: {
       // 深色 / 浅色模式
       colorMode: {
         defaultMode: 'light',
-        respectPrefersColorScheme: true,
-        disableSwitch: false,
+        respectPrefersColorScheme: false,
+        disableSwitch: true,
       },
 
       docs: {

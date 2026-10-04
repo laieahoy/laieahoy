@@ -69,6 +69,8 @@ function build() {
     });
   }
 
+  articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(outFile, JSON.stringify(articles, null, 2), 'utf8');
   console.log('Wrote', outFile, '(', articles.length, 'articles )');
