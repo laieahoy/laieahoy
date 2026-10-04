@@ -8,21 +8,24 @@ import styles from '@site/src/pages/write.module.css';
 import {getCategoryOptions} from '@site/src/data/categoryTree';
 
 const latexSnippets = [
-  {label: '分式', value: '\\frac{a}{b}'},
-  {label: '积分', value: '\\int_a^b f(x) \\, dx'},
-  {label: '求和', value: '\\sum_{i=1}^{n} i^2'},
-  {label: '极限', value: '\\lim_{n \\to \\infty} \\frac{1}{n}'},
-  {label: '根号', value: '\\sqrt{x^2 + y^2}'},
-  {label: '矩阵', value: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}'},
-  {
-    label: '公式块',
-    value: String.raw`\[
+  {label: '分式', preview: '\\frac{a}{b}', value: '\\frac{a}{b}'},
+  {label: '积分', preview: '\\int_a^b', value: '\\int_a^b f(x) \\, dx'},
+  {label: '求和', preview: '\\sum_{i=1}^{n}', value: '\\sum_{i=1}^{n} i^2'},
+  {label: '极限', preview: '\\lim_{x\\to 0}', value: '\\lim_{n \\to \\infty} \\frac{1}{n}'},
+  {label: '根号', preview: '\\sqrt{x^2+y^2}', value: '\\sqrt{x^2 + y^2}'},
+  {label: '矩阵', preview: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}', value: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}'},
+  {label: '方程组', preview: '\\begin{cases} x+y=1 \\\\ x-y=2 \\end{cases}', value: String.raw`\[
+\begin{cases}
+ x + y = 1 \\
+ x - y = 2
+\end{cases}
+\]`},
+  {label: '公式块', preview: '\\begin{aligned}', value: String.raw`\[
 \begin{aligned}
 (a+b)^2 &= a^2 + 2ab + b^2\\
 (a-b)^2 &= a^2 - 2ab + b^2
 \end{aligned}
-\]`,
-  },
+\]`},
 ];
 
 const initialForm = {
@@ -85,6 +88,7 @@ export default function WritePage() {
   const [originalDate, setOriginalDate] = useState('');
   const [originalArticle, setOriginalArticle] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [latexSearch, setLatexSearch] = useState('');
   const initialFilePath = useMemo(() => {
     if (typeof window === 'undefined') {
       return '';
@@ -101,6 +105,18 @@ export default function WritePage() {
 
   const categoryOptions = useMemo(() => getCategoryOptions(), []);
   const selectedPost = posts.find((post) => post.filePath === selectedFilePath) || null;
+  const filteredLatexSnippets = useMemo(() => {
+    const keyword = latexSearch.trim().toLowerCase();
+
+    if (!keyword) {
+      return latexSnippets;
+    }
+
+    return latexSnippets.filter((snippet) => {
+      const haystack = `${snippet.label} ${snippet.preview} ${snippet.value}`.toLowerCase();
+      return haystack.includes(keyword);
+    });
+  }, [latexSearch]);
 
   function insertLatexSnippet(snippet) {
     const textarea = textareaRef.current;
@@ -452,7 +468,7 @@ password: form.password,
               <label htmlFor="content">Markdown 正文</label>
               <div className={styles.latexToolbar}>
                 <div className={styles.latexHeaderRow}>
-                  <span className={styles.latexTitle}>数学速查</span>
+                  <span className={styles.latexTitle}>公式速查</span>
                   <a
                     className={styles.latexLink}
                     href="https://katex.org/docs/support_table"
@@ -462,18 +478,32 @@ password: form.password,
                     LATEX 公式写法大全
                   </a>
                 </div>
+
+                <input
+                  type="text"
+                  className={styles.latexSearchInput}
+                  value={latexSearch}
+                  onChange={(event) => setLatexSearch(event.target.value)}
+                  placeholder="搜索公式或关键字"
+                  aria-label="搜索 LaTeX 公式"
+                />
+
                 <div className={styles.latexChips}>
-                  {latexSnippets.map((snippet) => (
-                    <button
-                      key={snippet.label}
-                      type="button"
-                      className={styles.latexChip}
-                      onClick={() => insertLatexSnippet(snippet.value)}
-                      title={snippet.label}
-                    >
-                      {snippet.label}
-                    </button>
-                  ))}
+                  {filteredLatexSnippets.length > 0 ? (
+                    filteredLatexSnippets.map((snippet) => (
+                      <button
+                        key={snippet.label}
+                        type="button"
+                        className={styles.latexChip}
+                        onClick={() => insertLatexSnippet(snippet.value)}
+                        title={snippet.label}
+                      >
+                        {snippet.preview}
+                      </button>
+                    ))
+                  ) : (
+                    <span className={styles.latexEmptyState}>没有找到匹配公式</span>
+                  )}
                 </div>
               </div>
               <textarea

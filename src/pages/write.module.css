@@ -120,7 +120,7 @@
 .latexToolbar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   padding: 12px 14px 10px;
   margin-bottom: 12px;
   border: 1px solid var(--ifm-color-emphasis-300);
@@ -161,6 +161,23 @@
   text-decoration: underline;
 }
 
+.latexSearchInput {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: 999px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font: inherit;
+}
+
+.latexSearchInput:focus {
+  border-color: var(--ifm-color-primary);
+  outline: 2px solid var(--ifm-color-primary-lightest);
+}
+
 .latexChips {
   display: flex;
   flex-wrap: wrap;
@@ -174,6 +191,7 @@
   background: var(--ifm-background-surface-color);
   color: var(--ifm-font-color-base);
   padding: 7px 12px;
+  font-family: var(--ifm-font-family-monospace);
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
@@ -184,6 +202,12 @@
   border-color: var(--ifm-color-primary);
   background: color-mix(in srgb, var(--ifm-color-primary) 10%, var(--ifm-background-surface-color));
   transform: translateY(-1px);
+}
+
+.latexEmptyState {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
 .contentInput {
