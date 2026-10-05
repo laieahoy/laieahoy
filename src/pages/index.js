@@ -70,7 +70,7 @@ function HomepageHeader() {
               </div>
               <div className={styles.panelCard}>
                 <p>minimal knowledge archive</p>
-                <strong>不追求热闹，只留下一点可用的秩序。</strong>
+                <strong>请坐，慢用。</strong>
               </div>
               <div className={styles.barWrap}>
                 <span className={styles.barFill} />
