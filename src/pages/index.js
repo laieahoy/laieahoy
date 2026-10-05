@@ -44,9 +44,6 @@ function HomepageHeader() {
               </span>
             </Heading>
             <p className={styles.lead}>
-              这里没有找到答案，
-              <br />
-              但留下了一些值得继续看的痕迹。
             </p>
             <div className={styles.actions}>
               <Link className={styles.primaryButton} to="/blog">

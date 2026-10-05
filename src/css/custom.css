@@ -103,14 +103,14 @@ body::after {
 
 .theme-blog-post-page article {
   position: relative;
-  overflow: hidden;
-  background: #f6f2ee;
-  border: 1px solid rgba(17, 17, 17, 0.1);
-  border-radius: 1.4rem 1.4rem 0 0;
-  box-shadow: 0 28px 64px rgba(17, 17, 17, 0.05);
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.theme-blog-post-page article::before {
+.theme-blog-post-page::before {
   content: '';
   position: fixed;
   top: 0;
@@ -118,23 +118,25 @@ body::after {
   right: 0;
   height: 18.5rem;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
   background: linear-gradient(135deg, #101010 0%, #191919 48%, #f6f2ee 48.5%, #f6f2ee 100%);
   clip-path: polygon(0 0, 100% 0, 100% 82%, 68% 90%, 0 100%);
 }
 
 .theme-blog-post-page article {
-  z-index: 1;
+  z-index: 2;
+  background-clip: padding-box;
 }
 
 .theme-blog-post-page article > * {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 .theme-blog-post-page article > header {
   padding: 3.25rem 2rem 1.1rem;
   color: #f4f1eb;
+  background: transparent;
 }
 
 .theme-blog-post-page article > header h1,
@@ -152,6 +154,11 @@ body::after {
 .theme-blog-post-page article > div > .markdown,
 .theme-blog-post-page .theme-blog-post-content {
   color: var(--site-text) !important;
+  background: rgba(255,255,255,0.95);
+  border-top: none;
+  margin-top: -1rem;
+  border-radius: 0 0 1rem 1rem;
+  box-shadow: 0 16px 40px rgba(17,17,17,0.04);
 }
 
 .theme-blog-post-page article > header h1 {
@@ -173,8 +180,6 @@ body::after {
 .theme-blog-post-page article > div > .markdown,
 .theme-blog-post-page .theme-blog-post-content {
   padding: 2rem clamp(1rem, 2vw, 2rem) 3rem;
-  background: rgba(255, 255, 255, 0.2);
-  border-top: 1px solid rgba(17, 17, 17, 0.08);
 }
 
 .theme-blog-post-page .markdown {

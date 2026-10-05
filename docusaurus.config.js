@@ -9,7 +9,7 @@ import rehypeKatex from 'rehype-katex';
 const config = {
   // 网站基本信息
   title: '505 Not Found',
-  tagline: '这里没有找到答案，但找到了一个博客。',
+  tagline: '记录技术笔记与题解。',
   favicon: 'img/favicon.svg',
 
   // 网站语言设置
