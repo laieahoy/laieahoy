@@ -117,7 +117,7 @@
   padding: 10px 12px;
 }
 
-.latexToolbar {
+.markdownToolbar {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -133,7 +133,7 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
-.latexHeaderRow {
+.markdownToolbarRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -141,12 +141,71 @@
   flex-wrap: wrap;
 }
 
-.latexTitle {
-  color: var(--ifm-color-primary);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.markdownButtonGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.markdownToolbarButton {
+  appearance: none;
+  min-width: 34px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.32);
+  color: #222;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.markdownToolbarButton:hover {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.insertMenu {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.insertMenu label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.insertMenu select,
+.insertMenu input {
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+.insertMenuButton {
+  appearance: none;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: 6px;
+  background: var(--ifm-color-primary);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .latexLink {
@@ -161,53 +220,8 @@
   text-decoration: underline;
 }
 
-.latexSearchInput {
-  width: 100%;
-  box-sizing: border-box;
-  min-height: 36px;
-  padding: 7px 10px;
-  border: 1px solid var(--ifm-color-emphasis-400);
-  border-radius: 999px;
-  background: var(--ifm-background-surface-color);
-  color: var(--ifm-font-color-base);
-  font: inherit;
-}
-
-.latexSearchInput:focus {
-  border-color: var(--ifm-color-primary);
-  outline: 2px solid var(--ifm-color-primary-lightest);
-}
-
-.latexChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.latexChip {
-  appearance: none;
-  border: 1px solid color-mix(in srgb, var(--ifm-color-primary) 30%, var(--ifm-color-emphasis-300));
-  border-radius: 999px;
-  background: var(--ifm-background-surface-color);
-  color: var(--ifm-font-color-base);
-  padding: 7px 12px;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-}
-
-.latexChip:hover {
-  border-color: var(--ifm-color-primary);
-  background: color-mix(in srgb, var(--ifm-color-primary) 10%, var(--ifm-background-surface-color));
-  transform: translateY(-1px);
-}
-
-.latexEmptyState {
-  color: var(--ifm-color-emphasis-600);
-  font-size: 0.82rem;
-  font-weight: 600;
+.editorPaneWrap {
+  display: block;
 }
 
 .contentInput {
@@ -216,6 +230,30 @@
   resize: vertical;
   font-family: var(--ifm-font-family-monospace);
   line-height: 1.65;
+}
+
+.editorFooterControls {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
+.editorViewToggle {
+  appearance: none;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editorViewToggleActive {
+  background: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  color: #fff;
 }
 
 .field input:focus,

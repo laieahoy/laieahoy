@@ -7,26 +7,39 @@ import rehypeKatex from 'rehype-katex';
 import styles from '@site/src/pages/write.module.css';
 import {getCategoryOptions} from '@site/src/data/categoryTree';
 
-const latexSnippets = [
-  {label: '分式', preview: '\\frac{a}{b}', value: '\\frac{a}{b}'},
-  {label: '积分', preview: '\\int_a^b', value: '\\int_a^b f(x) \\, dx'},
-  {label: '求和', preview: '\\sum_{i=1}^{n}', value: '\\sum_{i=1}^{n} i^2'},
-  {label: '极限', preview: '\\lim_{x\\to 0}', value: '\\lim_{n \\to \\infty} \\frac{1}{n}'},
-  {label: '根号', preview: '\\sqrt{x^2+y^2}', value: '\\sqrt{x^2 + y^2}'},
-  {label: '矩阵', preview: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}', value: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}'},
-  {label: '方程组', preview: '\\begin{cases} x+y=1 \\\\ x-y=2 \\end{cases}', value: String.raw`\[
-\begin{cases}
- x + y = 1 \\
- x - y = 2
-\end{cases}
-\]`},
-  {label: '公式块', preview: '\\begin{aligned}', value: String.raw`\[
-\begin{aligned}
-(a+b)^2 &= a^2 + 2ab + b^2\\
-(a-b)^2 &= a^2 - 2ab + b^2
-\end{aligned}
-\]`},
+const latexQuickTools = [
+  {label: 'H', value: 'H'},
+  {label: 'P', value: 'P'},
+  {label: 'B', value: 'B'},
+  {label: 'I', value: 'I'},
+  {label: 'Σ', value: '\\sum_{i=1}^{n}'},
+  {label: '√', value: '\\sqrt{x}'},
+  {label: '∫', value: '\\int_a^b f(x) \\, dx'},
+  {label: '∂', value: '\\partial'},
+  {label: '∈', value: '\\in'},
+  {label: '⋯', value: '\\cdots'},
+  {label: '⟨', value: '\\langle x \\rangle'},
+  {label: '⟩', value: '\\rangle'},
 ];
+
+const markdownActionButtons = [
+  {label: 'H1+', type: 'heading-up', value: '# '},
+  {label: 'H1-', type: 'heading-down', value: '## '},
+  {label: '—', type: 'divider', value: '\n---\n'},
+  {label: 'B', type: 'bold', value: 'bold'},
+  {label: 'I', type: 'italic', value: 'italic'},
+  {label: 'S', type: 'strike', value: 'strike'},
+  {label: '🔗', type: 'link', value: 'link'},
+  {label: '🖼', type: 'image', value: 'image'},
+  {label: '</>', type: 'code', value: 'code'},
+  {label: '▦', type: 'table', value: 'table'},
+  {label: '❝', type: 'quote', value: 'quote'},
+  {label: '•', type: 'bullet', value: 'bullet'},
+  {label: '1.', type: 'ordered', value: 'ordered'},
+  {label: '☑', type: 'todo', value: 'todo'},
+];
+
+const codeLanguageOptions = ['javascript', 'python', 'cpp', 'java', 'bash', 'json', 'markdown', 'sql', 'html', 'css'];
 
 const initialForm = {
   title: '',
@@ -88,7 +101,11 @@ export default function WritePage() {
   const [originalDate, setOriginalDate] = useState('');
   const [originalArticle, setOriginalArticle] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [latexSearch, setLatexSearch] = useState('');
+  const [showPreview, setShowPreview] = useState(true);
+  const [activeInsertMenu, setActiveInsertMenu] = useState(null);
+  const [codeLanguage, setCodeLanguage] = useState('javascript');
+  const [tableRows, setTableRows] = useState(3);
+  const [tableCols, setTableCols] = useState(3);
   const initialFilePath = useMemo(() => {
     if (typeof window === 'undefined') {
       return '';
@@ -105,24 +122,14 @@ export default function WritePage() {
 
   const categoryOptions = useMemo(() => getCategoryOptions(), []);
   const selectedPost = posts.find((post) => post.filePath === selectedFilePath) || null;
-  const filteredLatexSnippets = useMemo(() => {
-    const keyword = latexSearch.trim().toLowerCase();
 
-    if (!keyword) {
-      return latexSnippets;
-    }
-
-    return latexSnippets.filter((snippet) => {
-      const haystack = `${snippet.label} ${snippet.preview} ${snippet.value}`.toLowerCase();
-      return haystack.includes(keyword);
-    });
-  }, [latexSearch]);
-
-  function insertLatexSnippet(snippet) {
+  function insertWrappedMarkdown(prefix, suffix, placeholder = '文本') {
     const textarea = textareaRef.current;
     const start = textarea ? textarea.selectionStart : form.content.length;
     const end = textarea ? textarea.selectionEnd : form.content.length;
-    const nextContent = `${form.content.slice(0, start)}${snippet}${form.content.slice(end)}`;
+    const selectedText = form.content.slice(start, end) || placeholder;
+    const replacement = `${prefix}${selectedText}${suffix}`;
+    const nextContent = `${form.content.slice(0, start)}${replacement}${form.content.slice(end)}`;
 
     setForm((current) => ({ ...current, content: nextContent }));
 
@@ -132,9 +139,133 @@ export default function WritePage() {
       }
 
       textarea.focus();
-      const nextCursor = start + snippet.length;
-      textarea.selectionStart = nextCursor;
-      textarea.selectionEnd = nextCursor;
+      const cursorStart = start + prefix.length;
+      const cursorEnd = cursorStart + selectedText.length;
+      textarea.selectionStart = cursorStart;
+      textarea.selectionEnd = cursorEnd;
+    });
+  }
+
+  function insertBlockMarkdown(block) {
+    const textarea = textareaRef.current;
+    const start = textarea ? textarea.selectionStart : form.content.length;
+    const end = textarea ? textarea.selectionEnd : form.content.length;
+    const selectedText = form.content.slice(start, end) || '内容';
+    const preparedBlock = block.replace(/\{text\}/g, selectedText);
+    const nextContent = `${form.content.slice(0, start)}${preparedBlock}${form.content.slice(end)}`;
+
+    setForm((current) => ({ ...current, content: nextContent }));
+
+    requestAnimationFrame(() => {
+      if (!textarea) {
+        return;
+      }
+
+      textarea.focus();
+      const cursorPos = start + preparedBlock.length;
+      textarea.selectionStart = cursorPos;
+      textarea.selectionEnd = cursorPos;
+    });
+  }
+
+  function handleMarkdownInsert(type) {
+    const textarea = textareaRef.current;
+    const start = textarea ? textarea.selectionStart : form.content.length;
+    const end = textarea ? textarea.selectionEnd : form.content.length;
+    const selectedText = form.content.slice(start, end) || '文本';
+
+    switch (type) {
+      case 'heading-up':
+        insertWrappedMarkdown('# ', '', selectedText);
+        break;
+      case 'heading-down':
+        insertWrappedMarkdown('## ', '', selectedText);
+        break;
+      case 'divider':
+        insertBlockMarkdown(`\n---\n`);
+        break;
+      case 'bold':
+        insertWrappedMarkdown('**', '**', selectedText);
+        break;
+      case 'italic':
+        insertWrappedMarkdown('*', '*', selectedText);
+        break;
+      case 'strike':
+        insertWrappedMarkdown('~~', '~~', selectedText);
+        break;
+      case 'link':
+        insertWrappedMarkdown('[', `](${selectedText || 'https://example.com'})`, selectedText || '链接');
+        break;
+      case 'image':
+        insertWrappedMarkdown('![', `](${selectedText || 'https://example.com/image.png'})`, selectedText || '图片');
+        break;
+      case 'code':
+        setActiveInsertMenu((current) => (current === 'code' ? null : 'code'));
+        break;
+      case 'table':
+        setActiveInsertMenu((current) => (current === 'table' ? null : 'table'));
+        break;
+      case 'quote':
+        insertBlockMarkdown(`> ${selectedText}\n`);
+        break;
+      case 'bullet':
+        insertBlockMarkdown(`- ${selectedText}\n`);
+        break;
+      case 'ordered':
+        insertBlockMarkdown(`1. ${selectedText}\n`);
+        break;
+      case 'todo':
+        insertBlockMarkdown(`- [ ] ${selectedText}\n`);
+        break;
+      default:
+        break;
+    }
+  }
+
+  function insertCodeBlock() {
+    const textarea = textareaRef.current;
+    const start = textarea ? textarea.selectionStart : form.content.length;
+    const end = textarea ? textarea.selectionEnd : form.content.length;
+    const selectedText = form.content.slice(start, end) || '代码';
+    const block = `\n\`\`\`${codeLanguage}\n${selectedText}\n\`\`\`\n`;
+    const nextContent = `${form.content.slice(0, start)}${block}${form.content.slice(end)}`;
+
+    setForm((current) => ({ ...current, content: nextContent }));
+    setActiveInsertMenu(null);
+
+    requestAnimationFrame(() => {
+      if (!textarea) {
+        return;
+      }
+
+      textarea.focus();
+      const cursorPos = start + block.indexOf('代码') + selectedText.length;
+      textarea.selectionStart = cursorPos;
+      textarea.selectionEnd = cursorPos;
+    });
+  }
+
+  function insertTableBlock() {
+    const textarea = textareaRef.current;
+    const start = textarea ? textarea.selectionStart : form.content.length;
+    const end = textarea ? textarea.selectionEnd : form.content.length;
+    const header = Array.from({ length: tableCols }, (_, index) => `Column ${index + 1}`).join(' | ');
+    const separator = Array.from({ length: tableCols }, () => '---').join(' | ');
+    const rows = Array.from({ length: tableRows - 1 }, () => Array.from({ length: tableCols }, () => 'value').join(' | ')).join('\n');
+    const block = `\n| ${header} |\n| ${separator} |\n| ${rows} |\n`;
+    const nextContent = `${form.content.slice(0, start)}${block}${form.content.slice(end)}`;
+
+    setForm((current) => ({ ...current, content: nextContent }));
+    setActiveInsertMenu(null);
+
+    requestAnimationFrame(() => {
+      if (!textarea) {
+        return;
+      }
+
+      textarea.focus();
+      textarea.selectionStart = start + block.length;
+      textarea.selectionEnd = start + block.length;
     });
   }
 
@@ -406,7 +537,7 @@ password: form.password,
           </div>
         </div>
 
-        <div className={`${styles.editorLayout} ${doublePane ? '' : styles.singlePane}`}>
+        <div className={`${styles.editorLayout} ${!showPreview || !doublePane ? styles.singlePane : ''}`}>
           <form className={styles.panel} onSubmit={handleSubmit}>
             <h2 className={styles.panelTitle}>{selectedFilePath ? '编辑现有文章' : '新建文章'}</h2>
 
@@ -466,9 +597,21 @@ password: form.password,
 
             <div className={styles.field}>
               <label htmlFor="content">Markdown 正文</label>
-              <div className={styles.latexToolbar}>
-                <div className={styles.latexHeaderRow}>
-                  <span className={styles.latexTitle}>公式速查</span>
+              <div className={styles.markdownToolbar}>
+                <div className={styles.markdownToolbarRow}>
+                  <div className={styles.markdownButtonGroup}>
+                    {markdownActionButtons.map((tool) => (
+                      <button
+                        key={tool.label + tool.type}
+                        type="button"
+                        className={styles.markdownToolbarButton}
+                        onClick={() => handleMarkdownInsert(tool.type)}
+                        title={tool.label}
+                      >
+                        {tool.label}
+                      </button>
+                    ))}
+                  </div>
                   <a
                     className={styles.latexLink}
                     href="https://katex.org/docs/support_table"
@@ -479,44 +622,57 @@ password: form.password,
                   </a>
                 </div>
 
-                <input
-                  type="text"
-                  className={styles.latexSearchInput}
-                  value={latexSearch}
-                  onChange={(event) => setLatexSearch(event.target.value)}
-                  placeholder="搜索公式或关键字"
-                  aria-label="搜索 LaTeX 公式"
-                />
+                {activeInsertMenu === 'code' && (
+                  <div className={styles.insertMenu}>
+                    <label>
+                      语言
+                      <select value={codeLanguage} onChange={(event) => setCodeLanguage(event.target.value)}>
+                        {codeLanguageOptions.map((language) => (
+                          <option key={language} value={language}>{language}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <button type="button" className={styles.insertMenuButton} onClick={insertCodeBlock}>插入代码块</button>
+                  </div>
+                )}
 
-                <div className={styles.latexChips}>
-                  {filteredLatexSnippets.length > 0 ? (
-                    filteredLatexSnippets.map((snippet) => (
-                      <button
-                        key={snippet.label}
-                        type="button"
-                        className={styles.latexChip}
-                        onClick={() => insertLatexSnippet(snippet.value)}
-                        title={snippet.label}
-                      >
-                        {snippet.preview}
-                      </button>
-                    ))
-                  ) : (
-                    <span className={styles.latexEmptyState}>没有找到匹配公式</span>
-                  )}
+                {activeInsertMenu === 'table' && (
+                  <div className={styles.insertMenu}>
+                    <label>
+                      行数
+                      <input type="number" min="1" max="10" value={tableRows} onChange={(event) => setTableRows(Number(event.target.value) || 1)} />
+                    </label>
+                    <label>
+                      列数
+                      <input type="number" min="1" max="10" value={tableCols} onChange={(event) => setTableCols(Number(event.target.value) || 1)} />
+                    </label>
+                    <button type="button" className={styles.insertMenuButton} onClick={insertTableBlock}>插入表格</button>
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.editorPaneWrap}>
+                  <textarea
+                    ref={textareaRef}
+                    id="content"
+                    name="content"
+                    className={styles.contentInput}
+                    value={form.content}
+                    onChange={handleChange}
+                    placeholder={'# 文章标题\n\n开始写文章……'}
+                  />
+                </div>
+
+                <div className={styles.editorFooterControls}>
+                  <button
+                    type="button"
+                    className={`${styles.editorViewToggle} ${showPreview ? styles.editorViewToggleActive : ''}`}
+                    onClick={() => setShowPreview((current) => !current)}
+                  >
+                    {showPreview ? '隐藏预览' : '显示预览'}
+                  </button>
                 </div>
               </div>
-              <textarea
-                ref={textareaRef}
-                id="content"
-                name="content"
-                className={styles.contentInput}
-                value={form.content}
-                onChange={handleChange}
-                placeholder={'# 文章标题\n\n开始写文章……'}
-              />
-            </div>
-
             <div className={styles.field}>
               <label htmlFor="password">发布密码</label>
               <input id="password" name="password" type="password" value={form.password} onChange={handleChange} placeholder="输入 Vercel 中设置的作者密码" autoComplete="off" />
@@ -558,17 +714,19 @@ password: form.password,
             )}
           </form>
 
-          <section className={styles.panel}>
-            <h2 className={styles.panelTitle}>实时预览</h2>
+          {showPreview && (
+            <section className={styles.panel}>
+              <h2 className={styles.panelTitle}>实时预览</h2>
 
-            <div className={styles.preview}>
-              {form.content.trim() ? (
-                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{form.content}</ReactMarkdown>
-              ) : (
-                <p className={styles.previewPlaceholder}>在左侧输入 Markdown 后，这里会显示预览。</p>
-              )}
-            </div>
-          </section>
+              <div className={styles.preview}>
+                {form.content.trim() ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{form.content}</ReactMarkdown>
+                ) : (
+                  <p className={styles.previewPlaceholder}>在左侧输入 Markdown 后，这里会显示预览。</p>
+                )}
+              </div>
+            </section>
+          )}
         </div>
       </main>
     </Layout>
